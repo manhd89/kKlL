@@ -5,6 +5,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import videojs from "video.js";
+import "video.js/dist/video-js.css";
 import { AlertTriangle, Loader2 } from "lucide-react";
 
 interface HlsPlayerProps {
@@ -26,8 +27,9 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
 
     // 1. Create a dynamic video element for stable videojs initialization with default skin support
     const videoElement = document.createElement("video");
-    videoElement.className = "video-js vjs-default-skin vjs-[#030303] vjs-big-play-centered w-full h-full";
+    videoElement.className = "video-js vjs-default-skin vjs-big-play-centered w-full h-full";
     videoElement.setAttribute("playsinline", "true");
+    videoElement.setAttribute("controls", "true");
     containerRef.current.appendChild(videoElement);
 
     // 2. Initialize videojs player with optimal configuration
@@ -36,6 +38,7 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
       controls: true,
       responsive: true,
       fluid: false,
+      fill: true,
       preload: "auto",
       errorDisplay: false, // Handled customly in UI
       sources: [
@@ -48,10 +51,7 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
         vhs: {
           overrideNative: true,
           fastQualityChange: true,
-        },
-        nativeVideoTracks: false,
-        nativeAudioTracks: false,
-        nativeTextTracks: false
+        }
       }
     });
 
@@ -97,6 +97,8 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
       {/* Dynamic Amber Overrides for VideoJS Controls CSS */}
       <style>{`
         .video-js {
+          width: 100% !important;
+          height: 100% !important;
           background-color: #030303 !important;
           color: #ffffff !important;
         }
@@ -135,7 +137,7 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
         .video-js .vjs-control-bar {
           background-color: rgba(5, 5, 8, 0.85) !important;
           backdrop-filter: blur(12px);
-          height: 3.55em !important;
+          display: flex !important; /* Ensure the control bar is visible */
         }
       `}</style>
 
