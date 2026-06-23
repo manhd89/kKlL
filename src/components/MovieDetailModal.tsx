@@ -317,9 +317,9 @@ export default function MovieDetailModal({
                             ? "bg-amber-500 text-black shadow-md shadow-amber-500/10"
                             : "text-gray-400 hover:text-white"
                         }`}
-                        title="Phát phim trực tiếp từ luồng m3u8 cực mượt, không quảng cáo"
+                        title="Phát phim dạng trực tiếp từ luồng m3u8"
                       >
-                        HLS PLAYER (MƯỢT)
+                        HLS PLAYER
                       </button>
                       <button
                         onClick={() => setPlayerType("embed")}
@@ -328,7 +328,7 @@ export default function MovieDetailModal({
                             ? "bg-amber-500 text-black shadow-md"
                             : "text-gray-400 hover:text-white"
                         }`}
-                        title="Trình phát iframe dự phòng của hệ thống gốc"
+                        title="Trình phát iframe dự phòng"
                       >
                         DỰ PHÒNG (IFRAME)
                       </button>
@@ -343,7 +343,14 @@ export default function MovieDetailModal({
                             key={srv.server_name}
                             onClick={() => {
                               setSelectedServerIndex(idx);
-                              if (srv.server_data && srv.server_data.length > 0) {
+                              if (activeEpisode) {
+                                const matched = srv.server_data.find(e => e.slug === activeEpisode.slug);
+                                if (matched) {
+                                  setActiveEpisode(matched);
+                                } else if (srv.server_data.length > 0) {
+                                  setActiveEpisode(srv.server_data[0]);
+                                }
+                              } else if (srv.server_data && srv.server_data.length > 0) {
                                 setActiveEpisode(srv.server_data[0]);
                               }
                             }}
@@ -363,37 +370,19 @@ export default function MovieDetailModal({
 
                 {/* 16:9 Video container stage */}
                 {activeEpisode ? (
-                  <div className="space-y-3">
-                    <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
-                      {playerType === "hls" && activeEpisode.link_m3u8 ? (
-                        <HlsPlayer url={activeEpisode.link_m3u8} autoplay={true} />
-                      ) : (
-                        <iframe
-                          id="embedded-video-player"
-                          src={activeEpisode.link_embed}
-                          title={`Stream ${activeEpisode.name}`}
-                          allowFullScreen
-                          className="absolute inset-0 w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        />
-                      )}
-                    </div>
-                    
-                    {/* Warning note context */}
-                    <div className="flex items-start gap-2 p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl text-[11px] text-gray-400 leading-relaxed">
-                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                      <div>
-                        {playerType === "hls" ? (
-                          <p>
-                            <strong>HLS Player (.m3u8):</strong> Phát trực tiếp luồng video để loại bỏ triệt để các quảng cáo popup bật lên, quảng cáo chuyển hướng hoặc mã độc từ khung chứa iframe. <em>Lưu ý: các video quảng cáo cờ bạc, text giới thiệu được nhà cung cấp nguồn chèn trực tiếp (hardcoded) vào luồng phim thì không thể lọc bỏ được do thuộc về dữ liệu video gốc.</em>
-                          </p>
-                        ) : (
-                          <p>
-                            <strong>Trình phát Dự phòng (Iframe):</strong> Nhúng trực tiếp trình phát của link embed. Chế độ này có nhiều quảng cáo dạng popup, banner và mã độc tự động nhảy tab từ trang phân phối gốc cũ.
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                  <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
+                    {playerType === "hls" && activeEpisode.link_m3u8 ? (
+                      <HlsPlayer url={activeEpisode.link_m3u8} autoplay={true} />
+                    ) : (
+                      <iframe
+                        id="embedded-video-player"
+                        src={activeEpisode.link_embed}
+                        title={`Stream ${activeEpisode.name}`}
+                        allowFullScreen
+                        className="absolute inset-0 w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      />
+                    )}
                   </div>
                 ) : (
                   <div className="aspect-[16/9] w-full bg-gray-950 border border-gray-900 rounded-2xl flex flex-col items-center justify-center text-center p-6 space-y-2">
@@ -404,10 +393,48 @@ export default function MovieDetailModal({
               </div>
 
               {/* EPISODE LIST AREA */}
-              <div className="pt-2">
-                <div className="flex items-center gap-2 mb-4 scroll-mt-20">
-                  <List className="w-4.5 h-4.5 text-gray-400" />
-                  <h3 className="text-xs font-black uppercase tracking-widest text-[#6c7a89]">Danh sách tập phim</h3>
+              <div className="pt-2 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <List className="w-4.5 h-4.5 text-gray-400" />
+                    <h3 className="text-xs font-black uppercase tracking-widest text-[#6c7a89]">Danh sách tập phim</h3>
+                  </div>
+
+                  {/* Server tabs selection directly in the episode area */}
+                  {episodes.length > 1 && (
+                    <div className="flex flex-wrap items-center gap-1.5 bg-[#121420] border border-gray-800 p-1 rounded-xl">
+                      <span className="text-[10px] text-gray-500 font-bold uppercase px-2 select-none">Hệ thống Server:</span>
+                      {episodes.map((srv, idx) => {
+                        const isSelected = selectedServerIndex === idx;
+                        return (
+                          <button
+                            key={srv.server_name}
+                            onClick={() => {
+                              setSelectedServerIndex(idx);
+                              // Keep the same episode slug active if possible across servers
+                              if (activeEpisode) {
+                                const matched = srv.server_data.find(e => e.slug === activeEpisode.slug);
+                                if (matched) {
+                                  setActiveEpisode(matched);
+                                } else if (srv.server_data.length > 0) {
+                                  setActiveEpisode(srv.server_data[0]);
+                                }
+                              } else if (srv.server_data.length > 0) {
+                                setActiveEpisode(srv.server_data[0]);
+                              }
+                            }}
+                            className={`px-3 py-1 text-[10px] font-bold rounded-lg cursor-pointer transition-all ${
+                              isSelected
+                                ? "bg-amber-500 text-black shadow-md font-extrabold"
+                                : "text-gray-400 hover:text-white"
+                            }`}
+                          >
+                            {srv.server_name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {episodes && episodes[selectedServerIndex] ? (

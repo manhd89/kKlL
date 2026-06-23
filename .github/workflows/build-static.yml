@@ -1,4 +1,4 @@
-name: Build and Deploy Static Site
+name: Build Static Site
 
 on:
   push:
@@ -11,16 +11,8 @@ on:
       - master
   workflow_dispatch:
 
-# Grant minimum permissions and pages permissions if deploying
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs in progress
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -46,26 +38,3 @@ jobs:
           name: static-site
           path: dist/
 
-      - name: Upload pages artifact
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/
-
-  deploy:
-    # Add dependency on the build job
-    needs: build
-    
-    # Only deploy on pushes to main or master
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
-    # Target environment
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-      
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
