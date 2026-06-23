@@ -1,0 +1,72 @@
+name: Build and Deploy Static Site
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+# Grant minimum permissions and pages permissions if deploying
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs in progress
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static files (Vite)
+        run: npx vite build
+
+      - name: Upload static build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: dist/
+
+      - name: Upload pages artifact
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+  deploy:
+    # Add dependency on the build job
+    needs: build
+    
+    # Only deploy on pushes to main or master
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    # Target environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
