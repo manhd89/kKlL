@@ -5,7 +5,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import videojs from "video.js";
-import "video.js/dist/video-js.css";
 import { AlertTriangle, Loader2 } from "lucide-react";
 
 interface HlsPlayerProps {
@@ -25,9 +24,9 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
     setError(null);
     setIsLoading(true);
 
-    // 1. Create a dynamic video element for stable videojs initialization
+    // 1. Create a dynamic video element for stable videojs initialization with default skin support
     const videoElement = document.createElement("video");
-    videoElement.className = "video-js vjs-big-play-centered w-full h-full";
+    videoElement.className = "video-js vjs-default-skin vjs-[#030303] vjs-big-play-centered w-full h-full";
     videoElement.setAttribute("playsinline", "true");
     containerRef.current.appendChild(videoElement);
 
@@ -99,18 +98,18 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
       <style>{`
         .video-js {
           background-color: #030303 !important;
-          font-family: inherit;
+          color: #ffffff !important;
         }
         .video-js .vjs-big-play-button {
           background-color: rgba(245, 158, 11, 0.9) !important;
           border-color: #f59e0b !important;
           color: #000000 !important;
           border-radius: 9999px !important;
-          width: 2.5em !important;
-          height: 2.5em !important;
-          line-height: 2.5em !important;
-          margin-left: -1.25em !important;
-          margin-top: -1.25em !important;
+          width: 2.2em !important;
+          height: 2.2em !important;
+          line-height: 2.2em !important;
+          margin-left: -1.1em !important;
+          margin-top: -1.1em !important;
           box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -137,9 +136,6 @@ export default function HlsPlayer({ url, autoplay = true }: HlsPlayerProps) {
           background-color: rgba(5, 5, 8, 0.85) !important;
           backdrop-filter: blur(12px);
           height: 3.55em !important;
-        }
-        .video-js .vjs-icon-placeholder {
-          font-family: VideoJS !important;
         }
       `}</style>
 
