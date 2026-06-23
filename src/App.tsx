@@ -14,12 +14,27 @@ import { Film, Sparkles, BookMarked, ThumbsUp } from "lucide-react";
 import { getDirectApiUrl } from "./utils";
 
 export default function App() {
-  // Navigation & Filter states
-  const [activeTab, setActiveTab] = useState("phim-moi-cap-nhat"); // e.g. 'phim-moi-cap-nhat', 'phim-le', 'phim-bo', 'genre', 'country', 'search', 'bookmarks'
-  const [activeSubSlug, setActiveSubSlug] = useState(""); // Genre slug or Country slug
-  const [activeLabel, setActiveLabel] = useState(""); // UI title label (e.g. "Hành động")
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchKeyword, setSearchKeyword] = useState("");
+  // Navigation & Filter states (Initialized directly from URL params)
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("tab") || "phim-moi-cap-nhat";
+  });
+  const [activeSubSlug, setActiveSubSlug] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("sub") || "";
+  });
+  const [activeLabel, setActiveLabel] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("label") || "";
+  });
+  const [currentPage, setCurrentPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return parseInt(params.get("page") || "1", 10);
+  });
+  const [searchKeyword, setSearchKeyword] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("search") || "";
+  });
 
   // DB Metadata states
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -33,10 +48,93 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   // Active watching movie details
-  const [selectedMovieSlug, setSelectedMovieSlug] = useState<string | null>(null);
+  const [selectedMovieSlug, setSelectedMovieSlug] = useState<string | null>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("movie");
+  });
 
   // Bookmarks/Favorites serialization persistence
   const [favoriteMovies, setFavoriteMovies] = useState<Movie[]>([]);
+
+  // Listen to popstate (back/forward history events)
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      setSelectedMovieSlug(params.get("movie"));
+      setActiveTab(params.get("tab") || "phim-moi-cap-nhat");
+      setActiveSubSlug(params.get("sub") || "");
+      setActiveLabel(params.get("label") || "");
+      setCurrentPage(parseInt(params.get("page") || "1", 10));
+      setSearchKeyword(params.get("search") || "");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  // Synchronize state changes back to url
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Process movie details
+    if (selectedMovieSlug) {
+      params.set("movie", selectedMovieSlug);
+    } else {
+      params.delete("movie");
+      params.delete("episode");
+      params.delete("server");
+    }
+
+    // Process tab/genres/countries filters
+    if (activeTab && activeTab !== "phim-moi-cap-nhat") {
+      params.set("tab", activeTab);
+    } else {
+      params.delete("tab");
+    }
+
+    if (activeSubSlug) {
+      params.set("sub", activeSubSlug);
+    } else {
+      params.delete("sub");
+    }
+
+    if (activeLabel) {
+      params.set("label", activeLabel);
+    } else {
+      params.delete("label");
+    }
+
+    if (currentPage > 1) {
+      params.set("page", currentPage.toString());
+    } else {
+      params.delete("page");
+    }
+
+    if (searchKeyword && activeTab === "search") {
+      params.set("search", searchKeyword);
+    } else {
+      params.delete("search");
+    }
+
+    const newQuery = params.toString() ? `?${params.toString()}` : "/";
+    const currentQuery = window.location.search || "/";
+
+    const newPath = newQuery.startsWith("/") ? newQuery : `/${newQuery}`;
+    const currentPath = currentQuery.startsWith("/") ? currentQuery : `/${currentQuery}`;
+
+    if (newPath !== currentPath) {
+      const prevMovie = new URLSearchParams(window.location.search).get("movie");
+      const isMovieToggle = (selectedMovieSlug && !prevMovie) || (!selectedMovieSlug && prevMovie);
+
+      if (isMovieToggle) {
+        window.history.pushState(null, "", newQuery);
+      } else {
+        window.history.replaceState(null, "", newQuery);
+      }
+    }
+  }, [activeTab, activeSubSlug, activeLabel, currentPage, searchKeyword, selectedMovieSlug]);
 
   // Load static collections on mount
   useEffect(() => {

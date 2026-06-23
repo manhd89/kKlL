@@ -31,7 +31,6 @@ export default function MovieDetailModal({
   const [selectedServerIndex, setSelectedServerIndex] = useState(0);
   const [activeEpisode, setActiveEpisode] = useState<EpisodeItem | null>(null);
   const [watchedEpisodes, setWatchedEpisodes] = useState<string[]>([]); // list of episode name/slug watched
-  const [playerType, setPlayerType] = useState<"hls" | "embed">("hls");
 
   const playerRef = useRef<HTMLDivElement>(null);
 
@@ -52,12 +51,36 @@ export default function MovieDetailModal({
             setMovieData(json.movie);
             setEpisodes(json.episodes || []);
             
-            // Set first episode of first server as default to play if episodes exist
+            // Check dynamic URL params for matching server name and episode slug
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlServerName = urlParams.get("server");
+            const urlEpisodeSlug = urlParams.get("episode");
+
+            // 1. Determine server index
+            let serverIndex = 0;
+            if (urlServerName && json.episodes) {
+              const foundIdx = json.episodes.findIndex((srv: MovieEpisode) => srv.server_name === urlServerName);
+              if (foundIdx !== -1) {
+                serverIndex = foundIdx;
+              }
+            }
+            setSelectedServerIndex(serverIndex);
+
+            // 2. Determine target episode
             if (json.episodes && json.episodes.length > 0) {
-              const server = json.episodes[0];
-              if (server.server_data && server.server_data.length > 0) {
-                // We do NOT play immediately automatically, but we select it
-                setActiveEpisode(server.server_data[0]);
+              const server = json.episodes[serverIndex];
+              if (server && server.server_data && server.server_data.length > 0) {
+                let targetEp = null;
+                if (urlEpisodeSlug) {
+                  targetEp = server.server_data.find((e: EpisodeItem) => e.slug === urlEpisodeSlug);
+                }
+                
+                // fallback to first episode if not found or not specified
+                if (!targetEp) {
+                  targetEp = server.server_data[0];
+                }
+                
+                setActiveEpisode(targetEp || null);
               }
             }
           } else {
@@ -89,6 +112,36 @@ export default function MovieDetailModal({
       active = false;
     };
   }, [movieSlug]);
+
+  // Synchronize active episode/server changes back to the URL
+  useEffect(() => {
+    if (!movieData) return;
+    const params = new URLSearchParams(window.location.search);
+    
+    // Ensure we preserve other fields like tab, sub, label, page, search
+    // but update those related to movie detailed streaming
+    params.set("movie", movieSlug);
+
+    const activeServer = episodes[selectedServerIndex];
+    if (activeServer) {
+      params.set("server", activeServer.server_name);
+    } else {
+      params.delete("server");
+    }
+
+    if (activeEpisode) {
+      params.set("episode", activeEpisode.slug);
+    } else {
+      params.delete("episode");
+    }
+
+    const newQuery = `?${params.toString()}`;
+    const currentQuery = window.location.search;
+
+    if (newQuery !== currentQuery) {
+      window.history.replaceState(null, "", newQuery);
+    }
+  }, [activeEpisode, selectedServerIndex, episodes, movieData, movieSlug]);
 
   // Save watched history state
   const handleSelectEpisode = (episode: EpisodeItem) => {
@@ -300,94 +353,29 @@ export default function MovieDetailModal({
                     <h2 className="text-base font-extrabold text-white flex items-center gap-2 select-none truncate">
                       <Play className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
                       {activeEpisode 
-                        ? `Trình Xem Video: ${activeEpisode.name}`
+                        ? `Đang Xem: ${activeEpisode.name}`
                         : "Chọn một tập để bắt đầu xem"
                       }
                     </h2>
-                  </div>
-                  
-                  {/* Selector Group: HLS vs Embed, and Server selection */}
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    {/* HLS/Iframe tabs */}
-                    <div className="flex items-center gap-1 bg-[#121420] border border-gray-800 p-1 rounded-xl">
-                      <button
-                        onClick={() => setPlayerType("hls")}
-                        className={`px-3 py-1 text-[10px] font-black tracking-wider rounded-lg transition-all cursor-pointer ${
-                          playerType === "hls"
-                            ? "bg-amber-500 text-black shadow-md shadow-amber-500/10"
-                            : "text-gray-400 hover:text-white"
-                        }`}
-                        title="Phát phim dạng trực tiếp từ luồng m3u8"
-                      >
-                        HLS PLAYER
-                      </button>
-                      <button
-                        onClick={() => setPlayerType("embed")}
-                        className={`px-3 py-1 text-[10px] font-black tracking-wider rounded-lg transition-all cursor-pointer ${
-                          playerType === "embed"
-                            ? "bg-amber-500 text-black shadow-md"
-                            : "text-gray-400 hover:text-white"
-                        }`}
-                        title="Trình phát iframe dự phòng"
-                      >
-                        DỰ PHÒNG (IFRAME)
-                      </button>
-                    </div>
-
-                    {/* Server selectors */}
-                    {episodes.length > 1 && (
-                      <div className="flex items-center gap-1 bg-[#121420] border border-gray-800 p-1 rounded-xl">
-                        <span className="text-[10px] text-gray-500 font-bold uppercase px-1.5">Nguồn:</span>
-                        {episodes.map((srv, idx) => (
-                          <button
-                            key={srv.server_name}
-                            onClick={() => {
-                              setSelectedServerIndex(idx);
-                              if (activeEpisode) {
-                                const matched = srv.server_data.find(e => e.slug === activeEpisode.slug);
-                                if (matched) {
-                                  setActiveEpisode(matched);
-                                } else if (srv.server_data.length > 0) {
-                                  setActiveEpisode(srv.server_data[0]);
-                                }
-                              } else if (srv.server_data && srv.server_data.length > 0) {
-                                setActiveEpisode(srv.server_data[0]);
-                              }
-                            }}
-                            className={`px-2 py-1 text-[10px] font-bold rounded-lg cursor-pointer transition-colors ${
-                              selectedServerIndex === idx
-                                ? "bg-amber-500 text-black shadow"
-                                : "text-gray-400 hover:text-white"
-                            }`}
-                          >
-                            {srv.server_name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
 
                 {/* 16:9 Video container stage */}
                 {activeEpisode ? (
                   <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
-                    {playerType === "hls" && activeEpisode.link_m3u8 ? (
+                    {activeEpisode.link_m3u8 ? (
                       <HlsPlayer url={activeEpisode.link_m3u8} autoplay={true} />
                     ) : (
-                      <iframe
-                        id="embedded-video-player"
-                        src={activeEpisode.link_embed}
-                        title={`Stream ${activeEpisode.name}`}
-                        allowFullScreen
-                        className="absolute inset-0 w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      />
+                      <div className="aspect-[16/9] w-full bg-gray-950 border border-gray-900 rounded-2xl flex flex-col items-center justify-center text-center p-6 space-y-2">
+                        <AlertTriangle className="w-10 h-10 text-amber-500 animate-pulse" />
+                        <p className="text-gray-400 text-sm">Tập phim này chưa sãn sàng nguồn phát m3u8 trực tiếp</p>
+                      </div>
                     )}
                   </div>
                 ) : (
                   <div className="aspect-[16/9] w-full bg-gray-950 border border-gray-900 rounded-2xl flex flex-col items-center justify-center text-center p-6 space-y-2">
                     <Film className="w-10 h-10 text-gray-800 animate-pulse" />
-                    <p className="text-gray-500 text-sm">Phim không có nguồn phát hợp lệ hiện có</p>
+                    <p className="text-gray-500 text-sm font-medium">Vui lòng chọn tập phim bên dưới để bắt đầu xem trực tiếp m3u8</p>
                   </div>
                 )}
               </div>
