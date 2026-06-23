@@ -1,0 +1,6 @@
+{
+  "name": "Xem Phim KKPhim",
+  "description": "Ứng dụng xem phim trực tuyến sử dụng KKPhim API",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
