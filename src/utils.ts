@@ -79,6 +79,69 @@ export function getMovieImageUrl(url: string, pathImage?: string): string {
 }
 
 /**
+ * Resolves a client request route to the direct phimapi.com API endpoint
+ */
+export function getDirectApiUrl(clientUrl: string): string {
+  const PHIMAPI_BASE = "https://phimapi.com";
+  
+  // 1. Genres
+  if (clientUrl === "/api/genres") {
+    return `${PHIMAPI_BASE}/the-loai`;
+  }
+  
+  // 2. Countries
+  if (clientUrl === "/api/countries") {
+    return `${PHIMAPI_BASE}/quoc-gia`;
+  }
+  
+  // 3. Search
+  if (clientUrl.startsWith("/api/movies/search")) {
+    const urlObj = new URL(clientUrl, "https://local");
+    const keyword = urlObj.searchParams.get("keyword") || "";
+    const page = urlObj.searchParams.get("page") || "1";
+    return `${PHIMAPI_BASE}/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&page=${page}`;
+  }
+  
+  // 4. Genre list
+  if (clientUrl.startsWith("/api/movies/genre/")) {
+    const parts = clientUrl.split("/");
+    const genreSlug = parts[4]?.split("?")[0] || "";
+    const urlObj = new URL(clientUrl, "https://local");
+    const page = urlObj.searchParams.get("page") || "1";
+    return `${PHIMAPI_BASE}/v1/api/the-loai/${genreSlug}?page=${page}`;
+  }
+
+  // 5. Country list
+  if (clientUrl.startsWith("/api/movies/country/")) {
+    const parts = clientUrl.split("/");
+    const countrySlug = parts[4]?.split("?")[0] || "";
+    const urlObj = new URL(clientUrl, "https://local");
+    const page = urlObj.searchParams.get("page") || "1";
+    return `${PHIMAPI_BASE}/v1/api/quoc-gia/${countrySlug}?page=${page}`;
+  }
+
+  // 6. Detail
+  if (clientUrl.startsWith("/api/movies/detail/")) {
+    const movieSlug = clientUrl.substring("/api/movies/detail/".length);
+    return `${PHIMAPI_BASE}/phim/${movieSlug}`;
+  }
+
+  // 7. General list (phim-moi-cap-nhat, phim-le, phim-bo, hoat-hinh, tv-shows)
+  if (clientUrl.startsWith("/api/movies/list/")) {
+    const parts = clientUrl.split("/");
+    const listSlug = parts[4]?.split("?")[0] || "";
+    const urlObj = new URL(clientUrl, "https://local");
+    const page = urlObj.searchParams.get("page") || "1";
+    if (listSlug === "phim-moi-cap-nhat" || listSlug === "phim-moi-cap-nhat-v3") {
+      return `${PHIMAPI_BASE}/danh-sach/phim-moi-cap-nhat-v3?page=${page}`;
+    }
+    return `${PHIMAPI_BASE}/v1/api/danh-sach/${listSlug}?page=${page}`;
+  }
+
+  return clientUrl;
+}
+
+/**
  * Standardize category names for badges
  */
 export function getQualityColor(quality: string | undefined): string {

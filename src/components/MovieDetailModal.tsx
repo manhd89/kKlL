@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { MovieDetail, MovieEpisode, EpisodeItem } from "../types";
-import { getMovieImageUrl } from "../utils";
+import { getMovieImageUrl, getDirectApiUrl } from "../utils";
 import { X, Heart, Star, Calendar, Clock, Eye, Play, Film, MessageCircle, AlertTriangle, List, CheckCircle2 } from "lucide-react";
 
 interface MovieDetailModalProps {
@@ -40,7 +40,7 @@ export default function MovieDetailModal({
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/movies/detail/${movieSlug}`);
+        const res = await fetch(getDirectApiUrl(`/api/movies/detail/${movieSlug}`));
         if (!res.ok) {
           throw new Error("Không thể tải thông tin chi tiết phim!");
         }

@@ -11,6 +11,7 @@ import MovieDetailModal from "./components/MovieDetailModal";
 import Footer from "./components/Footer";
 import { Movie, Genre, Country, Pagination } from "./types";
 import { Film, Sparkles, BookMarked, ThumbsUp } from "lucide-react";
+import { getDirectApiUrl } from "./utils";
 
 export default function App() {
   // Navigation & Filter states
@@ -43,8 +44,8 @@ export default function App() {
     const fetchMetadata = async () => {
       try {
         const [genresRes, countriesRes] = await Promise.all([
-          fetch("/api/genres"),
-          fetch("/api/countries"),
+          fetch(getDirectApiUrl("/api/genres")),
+          fetch(getDirectApiUrl("/api/countries")),
         ]);
         if (genresRes.ok) {
           const data = await genresRes.json();
@@ -142,7 +143,7 @@ export default function App() {
           fetchUrl = `/api/movies/list/${activeTab}?page=${currentPage}`;
         }
 
-        const res = await fetch(fetchUrl);
+        const res = await fetch(getDirectApiUrl(fetchUrl));
         if (!res.ok) {
           throw new Error("Không thể liên kết máy chủ cung cấp dữ liệu phim.");
         }
