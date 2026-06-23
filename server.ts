@@ -13,7 +13,6 @@ app.use(express.json());
 
 // API Fallback Hosts
 const PHIMAPI_BASE = "https://phimapi.com";
-const OPHIM_BASE = "https://ophim1.com";
 
 // Helper function to fetch with timeout and fallbacks
 async function fetchWithFallback(endpoints: string[]) {
@@ -53,9 +52,7 @@ async function fetchWithFallback(endpoints: string[]) {
 app.get("/api/genres", async (req, res) => {
   try {
     const urls = [
-      `${PHIMAPI_BASE}/the-loai`,
-      `${OPHIM_BASE}/v1/api/the-loai`,
-      `${OPHIM_BASE}/api/v1/the-loai`
+      `${PHIMAPI_BASE}/the-loai`
     ];
     const { data } = await fetchWithFallback(urls);
     res.json(data);
@@ -68,9 +65,7 @@ app.get("/api/genres", async (req, res) => {
 app.get("/api/countries", async (req, res) => {
   try {
     const urls = [
-      `${PHIMAPI_BASE}/quoc-gia`,
-      `${OPHIM_BASE}/v1/api/quoc-gia`,
-      `${OPHIM_BASE}/api/v1/quoc-gia`
+      `${PHIMAPI_BASE}/quoc-gia`
     ];
     const { data } = await fetchWithFallback(urls);
     res.json(data);
@@ -87,15 +82,11 @@ app.get("/api/movies/list/:slug", async (req, res) => {
     let urls: string[] = [];
     if (slug === "phim-moi-cap-nhat" || slug === "phim-moi-cap-nhat-v3") {
       urls = [
-        `${PHIMAPI_BASE}/danh-sach/phim-moi-cap-nhat-v3?page=${page}`,
-        `${OPHIM_BASE}/api/v1/danh-sach/phim-moi-cap-nhat?page=${page}`,
-        `${OPHIM_BASE}/v1/api/danh-sach/phim-moi-cap-nhat?page=${page}`
+        `${PHIMAPI_BASE}/danh-sach/phim-moi-cap-nhat-v3?page=${page}`
       ];
     } else {
       urls = [
-        `${PHIMAPI_BASE}/v1/api/danh-sach/${slug}?page=${page}`,
-        `${OPHIM_BASE}/api/v1/danh-sach/${slug}?page=${page}`,
-        `${OPHIM_BASE}/v1/api/danh-sach/${slug}?page=${page}`
+        `${PHIMAPI_BASE}/v1/api/danh-sach/${slug}?page=${page}`
       ];
     }
     
@@ -112,9 +103,7 @@ app.get("/api/movies/genre/:slug", async (req, res) => {
   const page = req.query.page || "1";
   try {
     const urls = [
-      `${PHIMAPI_BASE}/v1/api/the-loai/${slug}?page=${page}`,
-      `${OPHIM_BASE}/v1/api/the-loai/${slug}?page=${page}`,
-      `${OPHIM_BASE}/api/v1/the-loai/${slug}?page=${page}`
+      `${PHIMAPI_BASE}/v1/api/the-loai/${slug}?page=${page}`
     ];
     const { data } = await fetchWithFallback(urls);
     res.json(data);
@@ -129,9 +118,7 @@ app.get("/api/movies/country/:slug", async (req, res) => {
   const page = req.query.page || "1";
   try {
     const urls = [
-      `${PHIMAPI_BASE}/v1/api/quoc-gia/${slug}?page=${page}`,
-      `${OPHIM_BASE}/v1/api/quoc-gia/${slug}?page=${page}`,
-      `${OPHIM_BASE}/api/v1/quoc-gia/${slug}?page=${page}`
+      `${PHIMAPI_BASE}/v1/api/quoc-gia/${slug}?page=${page}`
     ];
     const { data } = await fetchWithFallback(urls);
     res.json(data);
@@ -151,9 +138,7 @@ app.get("/api/movies/search", async (req, res) => {
   try {
     const encodedKeyword = encodeURIComponent(String(keyword));
     const urls = [
-      `${PHIMAPI_BASE}/v1/api/tim-kiem?keyword=${encodedKeyword}&page=${page}`,
-      `${OPHIM_BASE}/v1/api/tim-kiem?keyword=${encodedKeyword}&page=${page}`,
-      `${OPHIM_BASE}/api/v1/tim-kiem?keyword=${encodedKeyword}&page=${page}`
+      `${PHIMAPI_BASE}/v1/api/tim-kiem?keyword=${encodedKeyword}&page=${page}`
     ];
     const { data } = await fetchWithFallback(urls);
     res.json(data);
@@ -167,10 +152,7 @@ app.get("/api/movies/detail/:slug", async (req, res) => {
   const { slug } = req.params;
   try {
     const urls = [
-      `${PHIMAPI_BASE}/phim/${slug}`,
-      `${OPHIM_BASE}/phim/${slug}`,
-      `${OPHIM_BASE}/api/v1/phim/${slug}`,
-      `${OPHIM_BASE}/v1/api/phim/${slug}`
+      `${PHIMAPI_BASE}/phim/${slug}`
     ];
     const { data } = await fetchWithFallback(urls);
     res.json(data);
