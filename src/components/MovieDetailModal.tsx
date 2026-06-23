@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { MovieDetail, MovieEpisode, EpisodeItem } from "../types";
 import { getMovieImageUrl, getDirectApiUrl } from "../utils";
+import HlsPlayer from "./HlsPlayer";
 import { X, Heart, Star, Calendar, Clock, Eye, Play, Film, MessageCircle, AlertTriangle, List, CheckCircle2 } from "lucide-react";
 
 interface MovieDetailModalProps {
@@ -30,6 +31,7 @@ export default function MovieDetailModal({
   const [selectedServerIndex, setSelectedServerIndex] = useState(0);
   const [activeEpisode, setActiveEpisode] = useState<EpisodeItem | null>(null);
   const [watchedEpisodes, setWatchedEpisodes] = useState<string[]>([]); // list of episode name/slug watched
+  const [playerType, setPlayerType] = useState<"hls" | "embed">("hls");
 
   const playerRef = useRef<HTMLDivElement>(null);
 
@@ -292,11 +294,11 @@ export default function MovieDetailModal({
                 ref={playerRef}
                 className="pt-4 border-t border-gray-800/50 space-y-4"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full animate-ping" />
-                    <h2 className="text-base font-extrabold text-white flex items-center gap-2 select-none">
-                      <Play className="w-4 h-4 text-amber-500 fill-amber-500" />
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-ping shrink-0" />
+                    <h2 className="text-base font-extrabold text-white flex items-center gap-2 select-none truncate">
+                      <Play className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
                       {activeEpisode 
                         ? `Trình Xem Video: ${activeEpisode.name}`
                         : "Chọn một tập để bắt đầu xem"
@@ -304,52 +306,93 @@ export default function MovieDetailModal({
                     </h2>
                   </div>
                   
-                  {/* Server selectors */}
-                  {episodes.length > 1 && (
-                    <div className="flex items-center gap-1.5 bg-[#121420] border border-gray-800 p-1 rounded-xl">
-                      <span className="text-[10px] text-gray-500 font-bold uppercase px-2">Nguồn:</span>
-                      {episodes.map((srv, idx) => (
-                        <button
-                          key={srv.server_name}
-                          onClick={() => {
-                            setSelectedServerIndex(idx);
-                            if (srv.server_data && srv.server_data.length > 0) {
-                              setActiveEpisode(srv.server_data[0]);
-                            }
-                          }}
-                          className={`px-2 py-1 text-[10px] font-bold rounded-lg cursor-pointer transition-colors ${
-                            selectedServerIndex === idx
-                              ? "bg-amber-500 text-black shadow"
-                              : "text-gray-400 hover:text-white"
-                          }`}
-                        >
-                          {srv.server_name}
-                        </button>
-                      ))}
+                  {/* Selector Group: HLS vs Embed, and Server selection */}
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    {/* HLS/Iframe tabs */}
+                    <div className="flex items-center gap-1 bg-[#121420] border border-gray-800 p-1 rounded-xl">
+                      <button
+                        onClick={() => setPlayerType("hls")}
+                        className={`px-3 py-1 text-[10px] font-black tracking-wider rounded-lg transition-all cursor-pointer ${
+                          playerType === "hls"
+                            ? "bg-amber-500 text-black shadow-md shadow-amber-500/10"
+                            : "text-gray-400 hover:text-white"
+                        }`}
+                        title="Phát phim trực tiếp từ luồng m3u8 cực mượt, không quảng cáo"
+                      >
+                        HLS PLAYER (MƯỢT)
+                      </button>
+                      <button
+                        onClick={() => setPlayerType("embed")}
+                        className={`px-3 py-1 text-[10px] font-black tracking-wider rounded-lg transition-all cursor-pointer ${
+                          playerType === "embed"
+                            ? "bg-amber-500 text-black shadow-md"
+                            : "text-gray-400 hover:text-white"
+                        }`}
+                        title="Trình phát iframe dự phòng của hệ thống gốc"
+                      >
+                        DỰ PHÒNG (IFRAME)
+                      </button>
                     </div>
-                  )}
+
+                    {/* Server selectors */}
+                    {episodes.length > 1 && (
+                      <div className="flex items-center gap-1 bg-[#121420] border border-gray-800 p-1 rounded-xl">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase px-1.5">Nguồn:</span>
+                        {episodes.map((srv, idx) => (
+                          <button
+                            key={srv.server_name}
+                            onClick={() => {
+                              setSelectedServerIndex(idx);
+                              if (srv.server_data && srv.server_data.length > 0) {
+                                setActiveEpisode(srv.server_data[0]);
+                              }
+                            }}
+                            className={`px-2 py-1 text-[10px] font-bold rounded-lg cursor-pointer transition-colors ${
+                              selectedServerIndex === idx
+                                ? "bg-amber-500 text-black shadow"
+                                : "text-gray-400 hover:text-white"
+                            }`}
+                          >
+                            {srv.server_name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* 16:9 Iframe video container stage */}
+                {/* 16:9 Video container stage */}
                 {activeEpisode ? (
                   <div className="space-y-3">
                     <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
-                      <iframe
-                        id="embedded-video-player"
-                        src={activeEpisode.link_embed}
-                        title={`Stream ${activeEpisode.name}`}
-                        allowFullScreen
-                        className="absolute inset-0 w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      />
+                      {playerType === "hls" && activeEpisode.link_m3u8 ? (
+                        <HlsPlayer url={activeEpisode.link_m3u8} autoplay={true} />
+                      ) : (
+                        <iframe
+                          id="embedded-video-player"
+                          src={activeEpisode.link_embed}
+                          title={`Stream ${activeEpisode.name}`}
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        />
+                      )}
                     </div>
                     
                     {/* Warning note context */}
-                    <div className="flex items-start gap-2 p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl text-[11px] text-amber-400 leading-relaxed">
-                      <AlertTriangle className="w-4.5 h-4.5 text-amber-500 shrink-0 mt-0.5" />
-                      <p>
-                        <strong>Mẹo:</strong> Nếu trình phát bị chậm, đứng hình hoặc hiển thị lỗi hãy đổi tập rồi chọn lại tập cũ, hoặc đổi nguồn phát (Server 2) ở góc phải. Các tập phim đều do bên thứ ba cung cấp nên có thể chứa quảng cáo đính kèm từ nguồn phát.
-                      </p>
+                    <div className="flex items-start gap-2 p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl text-[11px] text-gray-400 leading-relaxed">
+                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <div>
+                        {playerType === "hls" ? (
+                          <p>
+                            <strong>HLS Player (.m3u8):</strong> Phát trực tiếp luồng video để loại bỏ triệt để các quảng cáo popup bật lên, quảng cáo chuyển hướng hoặc mã độc từ khung chứa iframe. <em>Lưu ý: các video quảng cáo cờ bạc, text giới thiệu được nhà cung cấp nguồn chèn trực tiếp (hardcoded) vào luồng phim thì không thể lọc bỏ được do thuộc về dữ liệu video gốc.</em>
+                          </p>
+                        ) : (
+                          <p>
+                            <strong>Trình phát Dự phòng (Iframe):</strong> Nhúng trực tiếp trình phát của link embed. Chế độ này có nhiều quảng cáo dạng popup, banner và mã độc tự động nhảy tab từ trang phân phối gốc cũ.
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : (
