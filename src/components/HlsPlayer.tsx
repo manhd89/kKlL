@@ -17,9 +17,24 @@ interface HlsPlayerProps {
   autoplay?: boolean;
 }
 
+/**
+ * Gets the proxied HLS playlist URL from our backend,
+ * which dynamically filters out ad blocks (5-20 segments between discontinuities)
+ * and strips convertv path segments, fully bypassing browser CORS and native limitations.
+ */
+function getProxiedUrl(url: string): string {
+  if (!url) return url;
+  if (url.startsWith("/") || url.includes("/api/proxy-m3u8")) {
+    return url;
+  }
+  return `/api/proxy-m3u8?url=${encodeURIComponent(url)}`;
+}
+
 export default function HlsPlayer({ url, autoplay = false }: HlsPlayerProps) {
   const [error, setError] = useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  const proxiedUrl = getProxiedUrl(url);
 
   // Reset state whenever src URL changes to ensure smooth loading feedback
   useEffect(() => {
@@ -68,9 +83,9 @@ export default function HlsPlayer({ url, autoplay = false }: HlsPlayerProps) {
       )}
 
       <MediaPlayer
-        key={url}
+        key={proxiedUrl}
         title=""
-        src={url}
+        src={proxiedUrl}
         autoplay={autoplay}
         onCanPlay={handleCanPlay}
         onError={handleError}
