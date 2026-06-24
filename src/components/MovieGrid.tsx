@@ -6,32 +6,32 @@
 import React from "react";
 import { Movie } from "../types";
 import { getMovieImageUrl, getQualityColor } from "../utils";
-import { Play, Calendar, Eye, Heart, MessageSquare } from "lucide-react";
+import { Play, Calendar, Eye, Trash2, MessageSquare, History } from "lucide-react";
 import { motion } from "motion/react";
 
 interface MovieGridProps {
   movies: Movie[];
   pathImage: string;
   onSelectMovie: (slug: string) => void;
-  favorites: string[]; // list of project slug strings that are currently favorited
-  onToggleFavorite: (e: React.MouseEvent, movie: Movie) => void;
   pagination?: {
     currentPage: number;
     totalPages: number;
   };
   onPageChange?: (page: number) => void;
   isLoading?: boolean;
+  isHistoryTab?: boolean;
+  onRemoveFromHistory?: (e: React.MouseEvent, slug: string) => void;
 }
 
 export default function MovieGrid({
   movies,
   pathImage,
   onSelectMovie,
-  favorites,
-  onToggleFavorite,
   pagination,
   onPageChange,
   isLoading,
+  isHistoryTab = false,
+  onRemoveFromHistory,
 }: MovieGridProps) {
   if (isLoading) {
     return (
@@ -57,7 +57,6 @@ export default function MovieGrid({
       {/* Cards List Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         {movies.map((movie, index) => {
-          const isFav = favorites.includes(movie.slug);
           return (
             <motion.div
               key={movie._id || movie.slug}
@@ -108,19 +107,17 @@ export default function MovieGrid({
                   </div>
                 )}
 
-                {/* Favorite Bookmark Hot Button */}
-                <button
-                  id={`fav-btn-${movie.slug}`}
-                  onClick={(e) => onToggleFavorite(e, movie)}
-                  className={`absolute bottom-2 right-2 z-20 p-1.5 rounded-lg border backdrop-blur transition-all ${
-                    isFav
-                      ? "bg-rose-600/90 text-white border-rose-500 shadow-md shadow-rose-600/20"
-                      : "bg-black/70 text-gray-300 border-gray-800 hover:bg-black/90 hover:text-rose-400"
-                  }`}
-                  title={isFav ? "Xoá khỏi danh sách yêu thích" : "Thêm vào danh sách yêu thích"}
-                >
-                  <Heart className={`w-3.5 h-3.5 ${isFav ? "fill-white text-white" : ""}`} />
-                </button>
+                {/* Delete from Watch History Hot Button */}
+                {isHistoryTab && onRemoveFromHistory && (
+                  <button
+                    id={`remove-history-btn-${movie.slug}`}
+                    onClick={(e) => onRemoveFromHistory(e, movie.slug)}
+                    className="absolute bottom-2 right-2 z-20 p-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white backdrop-blur hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-md shadow-rose-500/10"
+                    title="Xoá khỏi lịch sử xem"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
               {/* Title / Meta Details Text Block */}

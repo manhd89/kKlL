@@ -6,21 +6,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { MovieDetail, MovieEpisode, EpisodeItem } from "../types";
 import { getMovieImageUrl, getDirectApiUrl } from "../utils";
-import HlsPlayer from "./HlsPlayer";
-import { X, Heart, Star, Calendar, Clock, Eye, Play, Film, MessageCircle, AlertTriangle, List, CheckCircle2 } from "lucide-react";
+import StreamPlayer from "./StreamPlayer";
+import { X, Star, Calendar, Clock, Eye, Play, Film, MessageCircle, AlertTriangle, List, CheckCircle2 } from "lucide-react";
 
 interface MovieDetailModalProps {
   movieSlug: string;
   onClose: () => void;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
+  onAddToHistory: (movie: any) => void;
 }
 
 export default function MovieDetailModal({
   movieSlug,
   onClose,
-  isFavorite,
-  onToggleFavorite,
+  onAddToHistory,
 }: MovieDetailModalProps) {
   const [movieData, setMovieData] = useState<MovieDetail | null>(null);
   const [episodes, setEpisodes] = useState<MovieEpisode[]>([]);
@@ -51,6 +49,7 @@ export default function MovieDetailModal({
           if (json && json.movie) {
             setMovieData(json.movie);
             setEpisodes(json.episodes || []);
+            onAddToHistory(json.movie);
             
             // Check dynamic URL params for matching server name and episode slug
             const urlParams = new URLSearchParams(window.location.search);
@@ -172,22 +171,10 @@ export default function MovieDetailModal({
         {/* Absolute header actions */}
         <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
           <button
-            id="modal-fav-toggle"
-            onClick={onToggleFavorite}
-            className={`p-2.5 rounded-full border backdrop-blur-md transition-all cursor-pointer ${
-              isFavorite
-                ? "bg-rose-500 text-white border-rose-400 shadow-lg shadow-rose-500/20"
-                : "bg-app-bg-input/80 text-app-text-muted border-app-border hover:text-rose-500"
-            }`}
-            title="Đánh dấu yêu thích"
-          >
-            <Heart className={`w-5 h-5 ${isFavorite ? "fill-white" : ""}`} />
-          </button>
-          
-          <button
             id="modal-close-btn"
             onClick={onClose}
-            className="p-2.5 rounded-full bg-app-bg-input/80 text-app-text-muted border border-app-border hover:bg-app-bg-input hover:text-app-text backdrop-blur-md transition-all cursor-pointer"
+            className="p-2.5 rounded-full bg-app-bg-input/80 text-app-text-muted border border-app-border hover:bg-app-bg-input hover:text-app-text backdrop-blur-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            title="Đóng chi tiết phim"
           >
             <X className="w-5 h-5" />
           </button>
@@ -366,7 +353,7 @@ export default function MovieDetailModal({
                 {activeEpisode ? (
                   <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-app-border shadow-2xl">
                     {activeEpisode.link_m3u8 ? (
-                      <HlsPlayer url={activeEpisode.link_m3u8} autoplay={playerAutoplay} />
+                      <StreamPlayer url={activeEpisode.link_m3u8} autoplay={playerAutoplay} />
                     ) : (
                       <div className="aspect-[16/9] w-full bg-gray-950 border border-gray-900 rounded-2xl flex flex-col items-center justify-center text-center p-6 space-y-2">
                         <AlertTriangle className="w-10 h-10 text-amber-500 animate-pulse" />

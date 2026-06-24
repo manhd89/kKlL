@@ -6,23 +6,19 @@
 import React, { useState, useEffect } from "react";
 import { Movie } from "../types";
 import { getMovieImageUrl } from "../utils";
-import { Play, Heart, ChevronLeft, ChevronRight, Calendar, Star } from "lucide-react";
+import { Play, ChevronLeft, ChevronRight, Calendar, Star } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface MovieCarouselProps {
   movies: Movie[];
   pathImage: string;
   onSelectMovie: (slug: string) => void;
-  favorites: string[];
-  onToggleFavorite: (e: React.MouseEvent, movie: Movie) => void;
 }
 
 export default function MovieCarousel({
   movies,
   pathImage,
   onSelectMovie,
-  favorites,
-  onToggleFavorite,
 }: MovieCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -41,7 +37,6 @@ export default function MovieCarousel({
   if (featuredMovies.length === 0) return null;
 
   const activeMovie = featuredMovies[currentIndex];
-  const isFav = favorites.includes(activeMovie.slug);
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + featuredMovies.length) % featuredMovies.length);
@@ -113,18 +108,6 @@ export default function MovieCarousel({
             title="Xem ngay tức thì"
           >
             <Play className="fill-black w-4 h-4 ml-0.5" /> Xem Phim
-          </button>
-
-          <button
-            onClick={(e) => onToggleFavorite(e, activeMovie)}
-            className={`p-2.5 sm:p-3 rounded-xl border backdrop-blur cursor-pointer hover:scale-[1.02] transition-transform ${
-              isFav
-                ? "bg-rose-500 text-white border-rose-400 shadow-md shadow-rose-500/20"
-                : "bg-app-bg-input/85 text-app-text-muted border-app-border hover:text-app-text"
-            }`}
-            title={isFav ? "Xoá khỏi danh sách yêu thích" : "Đánh dấu lưu trữ"}
-          >
-            <Heart className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isFav ? "fill-white" : ""}`} />
           </button>
         </div>
 

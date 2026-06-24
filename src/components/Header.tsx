@@ -4,16 +4,16 @@
  */
 
 import React, { useState } from "react";
-import { Search, Film, Heart, ChevronDown, Menu, X, Play } from "lucide-react";
+import { Search, Film, History, ChevronDown, Menu, X, Play } from "lucide-react";
 import { Genre, Country } from "../types";
 
 interface HeaderProps {
   genres: Genre[];
   countries: Country[];
-  activeTab: string; // e.g. 'phim-moi-cap-nhat', 'phim-le', 'phim-bo', 'genre', 'country', 'search', 'bookmarks'
+  activeTab: string; // e.g. 'phim-moi-cap-nhat', 'phim-le', 'phim-bo', 'genre', 'country', 'search', 'history'
   activeSubSlug: string; // the specific genre or country slug
   activeLabel: string; // e.g. "Hành động"
-  favoriteCount: number;
+  historyCount: number;
   onSearch: (keyword: string) => void;
   onSelectTab: (tab: string, subSlug?: string, label?: string) => void;
 }
@@ -24,7 +24,7 @@ export default function Header({
   activeTab,
   activeSubSlug,
   activeLabel,
-  favoriteCount,
+  historyCount,
   onSearch,
   onSelectTab,
 }: HeaderProps) {
@@ -191,24 +191,24 @@ export default function Header({
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Bookmark button */}
+            {/* History button */}
             <button
-              id="bookmark-btn"
+              id="history-btn"
               onClick={() => {
                 setSearchVal("");
-                onSelectTab("bookmarks");
+                onSelectTab("history");
               }}
               className={`relative p-2 rounded-xl cursor-pointer transition-all ${
-                activeTab === "bookmarks"
-                  ? "bg-rose-500/20 text-rose-500 border border-rose-500/30 shadow-md shadow-rose-500/10"
-                  : "text-app-text-muted hover:text-rose-400 hover:bg-rose-500/5"
+                activeTab === "history"
+                  ? "bg-amber-500/20 text-amber-500 border border-amber-500/30 shadow-md shadow-amber-500/10"
+                  : "text-app-text-muted hover:text-amber-500 hover:bg-amber-500/5"
               }`}
-              title="Danh sách yêu thích"
+              title="Lịch sử xem phim"
             >
-              <Heart className={`w-5.5 h-5.5 ${activeTab === "bookmarks" ? "fill-rose-500" : ""}`} />
-              {favoriteCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center leading-none animate-pulse">
-                  {favoriteCount}
+              <History className="w-5.5 h-5.5" />
+              {historyCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center leading-none animate-pulse">
+                  {historyCount}
                 </span>
               )}
             </button>

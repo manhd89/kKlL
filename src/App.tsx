@@ -10,7 +10,7 @@ import MovieGrid from "./components/MovieGrid";
 import MovieDetailModal from "./components/MovieDetailModal";
 import Footer from "./components/Footer";
 import { Movie, Genre, Country, Pagination } from "./types";
-import { Film, Sparkles, BookMarked, ThumbsUp } from "lucide-react";
+import { Film, Sparkles, History, Trash2 } from "lucide-react";
 import { getDirectApiUrl } from "./utils";
 
 export default function App() {
@@ -53,8 +53,8 @@ export default function App() {
     return params.get("movie");
   });
 
-  // Bookmarks/Favorites serialization persistence
-  const [favoriteMovies, setFavoriteMovies] = useState<Movie[]>([]);
+  // Watch History serialization persistence
+  const [watchHistory, setWatchHistory] = useState<Movie[]>([]);
 
   // Listen to popstate (back/forward history events)
   useEffect(() => {
@@ -194,28 +194,28 @@ export default function App() {
 
     fetchMetadata();
 
-    // 2. Fetch bookmarks list from local cache
-    const storedFavorites = localStorage.getItem("kkphim_my_favorites_list");
-    if (storedFavorites) {
+    // 2. Fetch watch history list from local cache
+    const storedHistory = localStorage.getItem("kkphim_watch_history");
+    if (storedHistory) {
       try {
-        setFavoriteMovies(JSON.parse(storedFavorites));
+        setWatchHistory(JSON.parse(storedHistory));
       } catch (e) {
-        console.error("Failed load local storage bookmarks list", e);
+        console.error("Failed load local storage watch history", e);
       }
     }
   }, []);
 
-  // Sync favorites back to localStorage whenever it changes
-  const saveFavorites = (list: Movie[]) => {
-    setFavoriteMovies(list);
-    localStorage.setItem("kkphim_my_favorites_list", JSON.stringify(list));
+  // Sync watch history back to localStorage whenever it changes
+  const saveWatchHistory = (list: Movie[]) => {
+    setWatchHistory(list);
+    localStorage.setItem("kkphim_watch_history", JSON.stringify(list));
   };
 
   // Movie list loader trigger based on filters
   useEffect(() => {
-    // If active tab is bookmarks, we don't query remote database
-    if (activeTab === "bookmarks") {
-      setMovies(favoriteMovies);
+    // If active tab is history, we don't query remote database
+    if (activeTab === "history") {
+      setMovies(watchHistory);
       setPathImage("");
       setPagination(undefined);
       setIsLoading(false);
@@ -286,7 +286,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, [activeTab, activeSubSlug, currentPage, searchKeyword, favoriteMovies.length]);
+  }, [activeTab, activeSubSlug, currentPage, searchKeyword, watchHistory.length]);
 
   // Handles updating active state selections
   const handleSelectTab = (tab: string, subSlug = "", label = "") => {
@@ -310,48 +310,42 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Toggle saving movie item on local Favorites array
-  const handleToggleFavorite = (e: React.MouseEvent, movie: Movie) => {
-    e.stopPropagation(); // prevent trigger card details modals opening
-    
-    const exists = favoriteMovies.find((f) => f.slug === movie.slug);
-    let updated: Movie[] = [];
-    if (exists) {
-      updated = favoriteMovies.filter((f) => f.slug !== movie.slug);
-    } else {
-      updated = [movie, ...favoriteMovies];
-    }
-    saveFavorites(updated);
+  // Automatically add a movie to the top of Watch History
+  const handleAddToHistory = (movieDetail: any) => {
+    if (!movieDetail) return;
+
+    const movieItem: Movie = {
+      _id: movieDetail._id || movieDetail.slug || Math.random().toString(),
+      name: movieDetail.name || "",
+      origin_name: movieDetail.origin_name || "",
+      slug: movieDetail.slug || "",
+      thumb_url: movieDetail.thumb_url || "",
+      poster_url: movieDetail.poster_url || "",
+      year: movieDetail.year || new Date().getFullYear(),
+      episode_current: movieDetail.episode_current || "",
+      quality: movieDetail.quality || "",
+      lang: movieDetail.lang || ""
+    };
+
+    setWatchHistory((prev) => {
+      const filtered = prev.filter((item) => item.slug !== movieItem.slug);
+      const updated = [movieItem, ...filtered].slice(0, 50); // limit to last 50 movies
+      localStorage.setItem("kkphim_watch_history", JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const handleToggleFavoriteInModal = (movieSlugStr: string) => {
-    const exists = favoriteMovies.find((f) => f.slug === movieSlugStr);
-    let updated: Movie[] = [];
-    if (exists) {
-      updated = favoriteMovies.filter((f) => f.slug !== movieSlugStr);
-    } else {
-      // Find film in active array list
-      const originalMovie = movies.find((m) => m.slug === movieSlugStr);
-      if (originalMovie) {
-        updated = [originalMovie, ...favoriteMovies];
-      } else {
-        // If it was selected outside current list, construct stub
-        const mockMovieItem: Movie = {
-          _id: movieSlugStr,
-          name: movieSlugStr.replace(/-/g, " "),
-          origin_name: "",
-          slug: movieSlugStr,
-          thumb_url: "",
-          poster_url: "",
-          year: new Date().getFullYear(),
-        };
-        updated = [mockMovieItem, ...favoriteMovies];
-      }
-    }
-    saveFavorites(updated);
+  const handleRemoveFromHistory = (e: React.MouseEvent, movieSlug: string) => {
+    e.stopPropagation();
+    const updated = watchHistory.filter((item) => item.slug !== movieSlug);
+    setWatchHistory(updated);
+    localStorage.setItem("kkphim_watch_history", JSON.stringify(updated));
   };
 
-  const favoritesSlugs = favoriteMovies.map((f) => f.slug);
+  const handleClearHistory = () => {
+    setWatchHistory([]);
+    localStorage.removeItem("kkphim_watch_history");
+  };
 
   // Derive dynamic page titles based on current selection
   const getSectionTitle = () => {
@@ -363,7 +357,7 @@ export default function App() {
     if (activeTab === "genre") return `Thể Loại: ${activeLabel}`;
     if (activeTab === "country") return `Quốc Gia: ${activeLabel}`;
     if (activeTab === "search") return activeLabel;
-    if (activeTab === "bookmarks") return "Phim Bạn Yêu Thích";
+    if (activeTab === "history") return "Lịch Sử Xem Phim";
     return "Danh Sách Phim";
   };
 
@@ -376,7 +370,7 @@ export default function App() {
         activeTab={activeTab}
         activeSubSlug={activeSubSlug}
         activeLabel={activeLabel}
-        favoriteCount={favoriteMovies.length}
+        historyCount={watchHistory.length}
         onSearch={handleSearch}
         onSelectTab={handleSelectTab}
       />
@@ -389,8 +383,6 @@ export default function App() {
             movies={movies}
             pathImage={pathImage}
             onSelectMovie={setSelectedMovieSlug}
-            favorites={favoritesSlugs}
-            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
@@ -398,8 +390,8 @@ export default function App() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-app-border pb-5">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-amber-500/10 text-amber-500 rounded-xl">
-              {activeTab === "bookmarks" ? (
-                <BookMarked className="w-5.5 h-5.5" />
+              {activeTab === "history" ? (
+                <History className="w-5.5 h-5.5" />
               ) : (
                 <Film className="w-5.5 h-5.5" />
               )}
@@ -416,10 +408,20 @@ export default function App() {
             </div>
           </div>
 
-          {/* Quick toggle list controls for favorites view empty conditions */}
-          {activeTab === "bookmarks" && favoriteMovies.length === 0 && (
-            <div className="text-xs text-rose-400 font-medium">
-              Chưa lưu phim nào! Hãy click biểu tượng Trái Tim ❤️ ở mỗi thẻ phim để thêm.
+          {/* Quick toggle list controls for history view conditions */}
+          {activeTab === "history" && watchHistory.length > 0 && (
+            <button
+              onClick={handleClearHistory}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl text-xs font-bold border border-rose-500/20 active:scale-95 transition-all cursor-pointer shadow-sm"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Xoá Toàn Bộ Lịch Sử
+            </button>
+          )}
+
+          {activeTab === "history" && watchHistory.length === 0 && (
+            <div className="text-xs text-amber-500 font-semibold bg-amber-500/5 px-3 py-1.5 rounded-lg border border-amber-500/15">
+              Bạn chưa xem bộ phim nào gần đây! Hãy bấm vào các bộ phim để thưởng thức.
             </div>
           )}
         </div>
@@ -448,11 +450,11 @@ export default function App() {
             movies={movies}
             pathImage={pathImage}
             onSelectMovie={setSelectedMovieSlug}
-            favorites={favoritesSlugs}
-            onToggleFavorite={handleToggleFavorite}
             pagination={pagination}
             onPageChange={handlePageChange}
             isLoading={isLoading}
+            isHistoryTab={activeTab === "history"}
+            onRemoveFromHistory={handleRemoveFromHistory}
           />
         )}
 
@@ -463,8 +465,7 @@ export default function App() {
         <MovieDetailModal
           movieSlug={selectedMovieSlug}
           onClose={() => setSelectedMovieSlug(null)}
-          isFavorite={favoritesSlugs.includes(selectedMovieSlug)}
-          onToggleFavorite={() => handleToggleFavoriteInModal(selectedMovieSlug)}
+          onAddToHistory={handleAddToHistory}
         />
       )}
 

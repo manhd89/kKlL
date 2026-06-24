@@ -12,15 +12,14 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
 
-interface HlsPlayerProps {
+interface StreamPlayerProps {
   url: string;
   autoplay?: boolean;
 }
 
 /**
  * Gets the proxied HLS playlist URL from our Service Worker proxy,
- * which dynamically filters out ad blocks (5-20 segments between discontinuities)
- * and strips convertv path segments at full network speed with zero memory leaks.
+ * which dynamically filters out ad blocks and strips convertv path segments at full speed.
  */
 function getProxiedUrl(url: string): string {
   if (!url) return "";
@@ -30,7 +29,7 @@ function getProxiedUrl(url: string): string {
   return `/proxy-hls/?url=${encodeURIComponent(url)}`;
 }
 
-export default function HlsPlayer({ url, autoplay = false }: HlsPlayerProps) {
+export default function StreamPlayer({ url, autoplay = false }: StreamPlayerProps) {
   const [error, setError] = useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
@@ -62,7 +61,7 @@ export default function HlsPlayer({ url, autoplay = false }: HlsPlayerProps) {
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#07080c] z-20 space-y-3 pointer-events-none">
           <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
           <p className="text-xs text-gray-400 font-semibold tracking-wide animate-pulse text-center px-4">
-            Đang tải luồng phát video HLS (.m3u8) với Service Worker...
+            Đang tải luồng phát video (.m3u8) với Service Worker...
           </p>
         </div>
       )}
