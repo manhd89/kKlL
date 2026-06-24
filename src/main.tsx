@@ -57,3 +57,27 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 );
 
+// Register service worker for high-speed client-side HLS proxying and ad-blocking
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => {
+        console.log('HLS AdBlocker Service Worker registered with scope: ', reg.scope);
+        // If there's an active worker, check for updates
+        reg.addEventListener('updatefound', () => {
+          const installingWorker = reg.installing;
+          if (installingWorker) {
+            installingWorker.addEventListener('statechange', () => {
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('New HLS AdBlocker Service Worker content is available; please refresh.');
+              }
+            });
+          }
+        });
+      })
+      .catch(err => {
+        console.error('HLS AdBlocker Service Worker registration failed: ', err);
+      });
+  });
+}
+
