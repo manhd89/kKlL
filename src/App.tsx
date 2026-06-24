@@ -258,7 +258,7 @@ export default function App() {
           setPathImage(path);
 
           // Pagination stats
-          const pagin = data.pagination || data.data?.pagination;
+          const pagin = data.pagination || data.data?.params?.pagination || data.data?.pagination;
           if (pagin) {
             setPagination({
               totalItems: Number(pagin.totalItems),

@@ -53,7 +53,7 @@ export default function MovieCarousel({
 
   return (
     <div 
-      className="relative w-full h-[320px] md:h-[420px] rounded-3xl overflow-hidden border border-gray-800/80 bg-black group shadow-2xl"
+      className="relative w-full h-[320px] md:h-[420px] rounded-3xl overflow-hidden border border-app-border dark:border-gray-800/80 bg-app-card dark:bg-black group shadow-xl dark:shadow-2xl transition-colors duration-300"
       id="hero-cinematic-banner"
     >
       {/* Background Poster Image with Widescreen Linear Mask */}
@@ -70,13 +70,13 @@ export default function MovieCarousel({
           <img
             src={getMovieImageUrl(activeMovie.poster_url || activeMovie.thumb_url, pathImage)}
             alt={activeMovie.name}
-            className="w-full h-full object-cover opacity-35 scale-102 blur-[1px]"
+            className="w-full h-full object-cover opacity-70 dark:opacity-35 scale-102 blur-[0.05px] transition-opacity duration-300"
             referrerPolicy="no-referrer"
           />
 
           {/* Vignette Spotlighting Layer */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0e1017] via-transparent to-[#0e1017]/30 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-app-card via-app-card/85 to-transparent dark:from-black dark:via-black/80 dark:to-transparent z-10 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-app-card/40 via-transparent to-transparent dark:from-[#0e1017] dark:via-transparent dark:to-[#0e1017]/30 z-10 transition-colors duration-300" />
         </motion.div>
       </AnimatePresence>
 
@@ -90,17 +90,17 @@ export default function MovieCarousel({
               <Star className="w-3 h-3 fill-amber-500" /> Nổi bật
             </span>
             {activeMovie.year && (
-              <span className="text-gray-400 font-medium">| {activeMovie.year}</span>
+              <span className="text-app-text-muted font-medium transition-colors duration-300">| {activeMovie.year}</span>
             )}
             {activeMovie.quality && (
-              <span className="text-gray-400 font-medium">| {activeMovie.quality}</span>
+              <span className="text-app-text-muted font-medium transition-colors duration-300">| {activeMovie.quality}</span>
             )}
           </div>
 
-          <h2 className="text-xl sm:text-3xl md:text-3xl font-black text-white leading-tight line-clamp-2 uppercase tracking-wide">
+          <h2 className="text-xl sm:text-3xl md:text-3xl font-black text-app-text leading-tight line-clamp-2 uppercase tracking-wide transition-colors duration-300">
             {activeMovie.name}
           </h2>
-          <h3 className="text-xs sm:text-sm font-semibold text-gray-400/90 line-clamp-1 italic">
+          <h3 className="text-xs sm:text-sm font-semibold text-app-text-muted line-clamp-1 italic transition-colors duration-300">
             {activeMovie.origin_name}
           </h3>
         </div>
@@ -120,7 +120,7 @@ export default function MovieCarousel({
             className={`p-2.5 sm:p-3 rounded-xl border backdrop-blur cursor-pointer hover:scale-[1.02] transition-transform ${
               isFav
                 ? "bg-rose-500 text-white border-rose-400 shadow-md shadow-rose-500/20"
-                : "bg-black/60 text-gray-300 border-gray-800 hover:text-white"
+                : "bg-app-bg-input/85 text-app-text-muted border-app-border hover:text-app-text"
             }`}
             title={isFav ? "Xoá khỏi danh sách yêu thích" : "Đánh dấu lưu trữ"}
           >
@@ -136,7 +136,7 @@ export default function MovieCarousel({
           {/* Prev Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full border border-gray-800 bg-black/60 text-gray-400 hover:text-white hover:bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden sm:block"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full border border-app-border bg-app-card/90 text-app-text-muted hover:text-app-text hover:bg-app-bg-input opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer hidden sm:block"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -144,7 +144,7 @@ export default function MovieCarousel({
           {/* Next Arrows */}
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full border border-gray-800 bg-black/60 text-gray-400 hover:text-white hover:bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden sm:block"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full border border-app-border bg-app-card/90 text-app-text-muted hover:text-app-text hover:bg-app-bg-input opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer hidden sm:block"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -156,7 +156,7 @@ export default function MovieCarousel({
                 key={i}
                 onClick={() => setCurrentIndex(i)}
                 className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
-                  currentIndex === i ? "w-6 bg-amber-500" : "bg-gray-600 hover:bg-gray-400"
+                  currentIndex === i ? "w-6 bg-amber-500" : "bg-app-border hover:bg-app-text-muted"
                 }`}
               />
             ))}
