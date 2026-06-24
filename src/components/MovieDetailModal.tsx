@@ -31,6 +31,7 @@ export default function MovieDetailModal({
   const [selectedServerIndex, setSelectedServerIndex] = useState(0);
   const [activeEpisode, setActiveEpisode] = useState<EpisodeItem | null>(null);
   const [watchedEpisodes, setWatchedEpisodes] = useState<string[]>([]); // list of episode name/slug watched
+  const [playerAutoplay, setPlayerAutoplay] = useState(false);
 
   const playerRef = useRef<HTMLDivElement>(null);
 
@@ -145,6 +146,7 @@ export default function MovieDetailModal({
 
   // Save watched history state
   const handleSelectEpisode = (episode: EpisodeItem) => {
+    setPlayerAutoplay(true);
     setActiveEpisode(episode);
     
     // Add to watched array
@@ -161,10 +163,10 @@ export default function MovieDetailModal({
   return (
     <div 
       id="movie-expanded-overlay"
-      className="fixed inset-0 z-50 overflow-y-auto bg-[#07080c]/98 backdrop-blur-sm flex justify-center py-4 px-2 sm:py-8 sm:px-4"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/65 backdrop-blur-sm flex justify-center py-4 px-2 sm:py-8 sm:px-4"
     >
       <div 
-        className="relative w-full max-w-5xl bg-[#0e1017] rounded-3xl overflow-hidden border border-gray-800 shadow-2xl flex flex-col max-h-full"
+        className="relative w-full max-w-5xl bg-app-card rounded-3xl overflow-hidden border border-app-border shadow-2xl flex flex-col max-h-full transition-colors duration-300"
       >
         
         {/* Absolute header actions */}
@@ -175,7 +177,7 @@ export default function MovieDetailModal({
             className={`p-2.5 rounded-full border backdrop-blur-md transition-all cursor-pointer ${
               isFavorite
                 ? "bg-rose-500 text-white border-rose-400 shadow-lg shadow-rose-500/20"
-                : "bg-black/60 text-gray-300 border-gray-800 hover:text-rose-400"
+                : "bg-app-bg-input/80 text-app-text-muted border-app-border hover:text-rose-500"
             }`}
             title="Đánh dấu yêu thích"
           >
@@ -185,7 +187,7 @@ export default function MovieDetailModal({
           <button
             id="modal-close-btn"
             onClick={onClose}
-            className="p-2.5 rounded-full bg-black/60 text-gray-300 border border-gray-800 hover:bg-black/80 hover:text-white backdrop-blur-md transition-colors cursor-pointer"
+            className="p-2.5 rounded-full bg-app-bg-input/80 text-app-text-muted border border-app-border hover:bg-app-bg-input hover:text-app-text backdrop-blur-md transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -194,23 +196,23 @@ export default function MovieDetailModal({
         {/* Backdrop Blurred Poster Graphic */}
         {movieData && (
           <div className="absolute top-0 left-0 right-0 h-[300px] overflow-hidden pointer-events-none select-none z-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0e1017]/80 to-[#0e1017] z-10" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-app-card/85 to-app-card z-10 transition-colors duration-300" />
             <img 
               src={getMovieImageUrl(movieData.poster_url || movieData.thumb_url)} 
               alt="" 
-              className="w-full h-full object-cover scale-110 opacity-15 blur-3xl"
+              className="w-full h-full object-cover scale-110 opacity-15 dark:opacity-25 blur-3xl"
               referrerPolicy="no-referrer"
             />
           </div>
         )}
 
         {/* Modal Scrollable Content Container */}
-        <div className="flex-1 overflow-y-auto z-10 p-4 sm:p-8 space-y-8 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto z-10 p-4 sm:p-8 space-y-8 scrollbar-thin text-app-text">
           
           {isLoading ? (
             <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
               <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-gray-400 text-sm font-medium">Đang thu thập dữ liệu chi tiết phim...</p>
+              <p className="text-app-text-muted text-sm font-medium">Đang thu thập dữ liệu chi tiết phim...</p>
             </div>
           ) : error ? (
             <div className="min-h-[400px] flex flex-col items-center justify-center text-center p-6 space-y-4 max-w-md mx-auto">
@@ -218,12 +220,12 @@ export default function MovieDetailModal({
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-gray-200 font-bold">Không thể khớp dữ liệu phim</p>
-                <p className="text-gray-500 text-xs mt-1">{error}</p>
+                <p className="text-app-text font-bold">Không thể khớp dữ liệu phim</p>
+                <p className="text-app-text-muted text-xs mt-1">{error}</p>
               </div>
               <button
                 onClick={onClose}
-                className="px-5 py-2.5 bg-gray-800 text-gray-200 hover:text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+                className="px-5 py-2.5 bg-app-bg-input border border-app-border text-app-text hover:text-amber-500 rounded-xl text-xs font-semibold cursor-pointer transition-colors"
               >
                 Quay lại Trang chủ
               </button>
@@ -235,7 +237,7 @@ export default function MovieDetailModal({
                 
                 {/* Poster column */}
                 <div className="md:col-span-4 lg:col-span-3 flex flex-col gap-4">
-                  <div className="aspect-[2/3] w-full rounded-2xl overflow-hidden border border-gray-800 shadow-2xl bg-gray-900 group">
+                  <div className="aspect-[2/3] w-full rounded-2xl overflow-hidden border border-app-border shadow-2xl bg-gray-900 group">
                     <img 
                       src={getMovieImageUrl(movieData.thumb_url || movieData.poster_url)} 
                       alt={movieData.name} 
@@ -245,14 +247,14 @@ export default function MovieDetailModal({
                   </div>
                   
                   {/* Secondary stats under poster */}
-                  <div className="bg-[#151824] border border-gray-800/60 rounded-xl p-3 flex flex-col gap-2.5 text-xs text-gray-400">
+                  <div className="bg-app-bg-input border border-app-border rounded-xl p-3 flex flex-col gap-2.5 text-xs text-app-text-muted transition-colors duration-300">
                     <div className="flex items-center justify-between">
                       <span>Trạng thái:</span>
-                      <span className="text-emerald-400 font-bold">{movieData.status === "completed" ? "Hoàn thành" : "Đang chiếu"}</span>
+                      <span className="text-emerald-500 font-bold">{movieData.status === "completed" ? "Hoàn thành" : "Đang chiếu"}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Thời lượng:</span>
-                      <span className="text-gray-200 font-medium">{movieData.time || "N/A"}</span>
+                      <span className="text-app-text font-medium">{movieData.time || "N/A"}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Số tập hiện có:</span>
@@ -270,43 +272,43 @@ export default function MovieDetailModal({
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-black">
                         {movieData.quality || "HD"}
                       </span>
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-gray-800 text-gray-300">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-app-bg-input text-app-text-muted border border-app-border/40">
                         {movieData.lang || "Lồng Tiếng"}
                       </span>
                       {movieData.year && (
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-gray-800 text-gray-300">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-app-bg-input text-app-text-muted border border-app-border/40">
                           Năm {movieData.year}
                         </span>
                       )}
                       {movieData.chieurap && (
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-500/20 text-rose-500 border border-rose-500/30">
                           Chiếu Rạp
                         </span>
                       )}
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+                    <h1 className="text-2xl sm:text-3xl font-black text-app-text tracking-tight leading-tight">
                       {movieData.name}
                     </h1>
-                    <h2 className="text-sm font-semibold text-gray-400 leading-none">
+                    <h2 className="text-sm font-semibold text-app-text-muted leading-none">
                       {movieData.origin_name}
                     </h2>
                   </div>
 
                   {/* Complete Metadata Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#121420] border border-gray-800/50 rounded-2xl p-4 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-app-bg-input/50 border border-app-border rounded-2xl p-4 text-xs transition-colors duration-300">
                     <div className="space-y-2">
                       <p>
-                        <span className="text-gray-500">Đạo diễn: </span>
-                        <span className="text-gray-200 font-medium select-all">
+                        <span className="text-app-text-muted/80">Đạo diễn: </span>
+                        <span className="text-app-text font-medium select-all">
                           {movieData.director && movieData.director.filter(Boolean).length > 0
                             ? movieData.director.join(", ")
                             : "N/A"}
                         </span>
                       </p>
                       <p className="line-clamp-2">
-                        <span className="text-gray-500">Diễn viên: </span>
-                        <span className="text-gray-200 font-medium select-all">
+                        <span className="text-app-text-muted/80">Diễn viên: </span>
+                        <span className="text-app-text font-medium select-all">
                           {movieData.actor && movieData.actor.filter(Boolean).length > 0
                             ? movieData.actor.join(", ")
                             : "Đang cập nhật"}
@@ -316,14 +318,14 @@ export default function MovieDetailModal({
 
                     <div className="space-y-2">
                       <p>
-                        <span className="text-gray-500">Thể loại: </span>
-                        <span className="text-amber-500/95 font-semibold">
+                        <span className="text-app-text-muted/80">Thể loại: </span>
+                        <span className="text-amber-500 font-semibold">
                           {movieData.category && movieData.category.map((c) => c.name).join(", ")}
                         </span>
                       </p>
                       <p>
-                        <span className="text-gray-500">Quốc gia: </span>
-                        <span className="text-gray-200 font-medium">
+                        <span className="text-app-text-muted/80">Quốc gia: </span>
+                        <span className="text-app-text font-medium">
                           {movieData.country && movieData.country.map((c) => c.name).join(", ")}
                         </span>
                       </p>
@@ -334,7 +336,7 @@ export default function MovieDetailModal({
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold uppercase tracking-widest text-[#6c7a89]">Tóm tắt nội dung</h4>
                     <div 
-                      className="text-gray-300 text-sm leading-relaxed max-h-[140px] overflow-y-auto pr-2 scrollbar-thin select-text line-clamp-4 hover:line-clamp-none transition-all duration-300"
+                      className="text-app-text text-sm leading-relaxed max-h-[140px] overflow-y-auto pr-2 scrollbar-thin select-text line-clamp-4 hover:line-clamp-none transition-all duration-300"
                       dangerouslySetInnerHTML={{ __html: movieData.content || "Nội dung phim đang được cập nhật..." }}
                     />
                   </div>
@@ -345,12 +347,12 @@ export default function MovieDetailModal({
               {/* VIDEO PLAYER COMPONENT BLOCK */}
               <div 
                 ref={playerRef}
-                className="pt-4 border-t border-gray-800/50 space-y-4"
+                className="pt-4 border-t border-app-border space-y-4"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-500 rounded-full animate-ping shrink-0" />
-                    <h2 className="text-base font-extrabold text-white flex items-center gap-2 select-none truncate">
+                    <h2 className="text-base font-extrabold text-app-text flex items-center gap-2 select-none truncate">
                       <Play className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
                       {activeEpisode 
                         ? `Đang Xem: ${activeEpisode.name}`
@@ -362,36 +364,36 @@ export default function MovieDetailModal({
 
                 {/* 16:9 Video container stage */}
                 {activeEpisode ? (
-                  <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
+                  <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-app-border shadow-2xl">
                     {activeEpisode.link_m3u8 ? (
-                      <HlsPlayer url={activeEpisode.link_m3u8} autoplay={false} />
+                      <HlsPlayer url={activeEpisode.link_m3u8} autoplay={playerAutoplay} />
                     ) : (
                       <div className="aspect-[16/9] w-full bg-gray-950 border border-gray-900 rounded-2xl flex flex-col items-center justify-center text-center p-6 space-y-2">
                         <AlertTriangle className="w-10 h-10 text-amber-500 animate-pulse" />
-                        <p className="text-gray-400 text-sm">Tập phim này chưa sãn sàng nguồn phát m3u8 trực tiếp</p>
+                        <p className="text-app-text-muted text-sm">Tập phim này chưa sãn sàng nguồn phát m3u8 trực tiếp</p>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="aspect-[16/9] w-full bg-gray-950 border border-gray-900 rounded-2xl flex flex-col items-center justify-center text-center p-6 space-y-2">
                     <Film className="w-10 h-10 text-gray-800 animate-pulse" />
-                    <p className="text-gray-500 text-sm font-medium">Vui lòng chọn tập phim bên dưới để bắt đầu xem trực tiếp m3u8</p>
+                    <p className="text-app-text-muted text-sm font-medium">Vui lòng chọn tập phim bên dưới để bắt đầu xem trực tiếp m3u8</p>
                   </div>
                 )}
               </div>
 
               {/* EPISODE LIST AREA */}
               <div className="pt-2 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-app-border pb-3">
                   <div className="flex items-center gap-2">
-                    <List className="w-4.5 h-4.5 text-gray-400" />
+                    <List className="w-4.5 h-4.5 text-app-text-muted" />
                     <h3 className="text-xs font-black uppercase tracking-widest text-[#6c7a89]">Danh sách tập phim</h3>
                   </div>
 
                   {/* Server tabs selection directly in the episode area */}
                   {episodes.length > 1 && (
-                    <div className="flex flex-wrap items-center gap-1.5 bg-[#121420] border border-gray-800 p-1 rounded-xl">
-                      <span className="text-[10px] text-gray-500 font-bold uppercase px-2 select-none">Hệ thống Server:</span>
+                    <div className="flex flex-wrap items-center gap-1.5 bg-app-bg-input border border-app-border p-1 rounded-xl transition-colors duration-300">
+                      <span className="text-[10px] text-app-text-muted font-bold uppercase px-2 select-none">Hệ thống Server:</span>
                       {episodes.map((srv, idx) => {
                         const isSelected = selectedServerIndex === idx;
                         return (
@@ -399,6 +401,7 @@ export default function MovieDetailModal({
                             key={srv.server_name}
                             onClick={() => {
                               setSelectedServerIndex(idx);
+                              setPlayerAutoplay(true);
                               // Keep the same episode slug active if possible across servers
                               if (activeEpisode) {
                                 const matched = srv.server_data.find(e => e.slug === activeEpisode.slug);
@@ -414,7 +417,7 @@ export default function MovieDetailModal({
                             className={`px-3 py-1 text-[10px] font-bold rounded-lg cursor-pointer transition-all ${
                               isSelected
                                 ? "bg-amber-500 text-black shadow-md font-extrabold"
-                                : "text-gray-400 hover:text-white"
+                                : "text-app-text-muted hover:text-app-text"
                             }`}
                           >
                             {srv.server_name}
@@ -439,8 +442,8 @@ export default function MovieDetailModal({
                             isActive
                               ? "bg-amber-500 text-black border-amber-400 font-extrabold shadow-md shadow-amber-500/20 scale-[1.03]"
                               : isWatched
-                              ? "bg-[#181d2a] text-gray-400 border-gray-800/80 hover:text-white"
-                              : "bg-[#0e1017] text-gray-300 border-gray-800 hover:border-gray-700 hover:text-white"
+                              ? "bg-app-bg-input text-app-text-muted border-app-border hover:text-app-text"
+                              : "bg-app-card text-app-text-muted border-app-border hover:border-amber-500/40 hover:text-app-text"
                           }`}
                         >
                           <span className="truncate">{epi.name}</span>
@@ -452,7 +455,7 @@ export default function MovieDetailModal({
                     })}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-xs">Phim chưa cập nhật tập nào, vui lòng quay lại sau.</p>
+                  <p className="text-app-text-muted text-xs">Phim chưa cập nhật tập nào, vui lòng quay lại sau.</p>
                 )}
               </div>
             </>
