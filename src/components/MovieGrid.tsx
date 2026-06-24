@@ -66,7 +66,7 @@ export default function MovieGrid({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: (index % 12) * 0.04 }}
               onClick={() => onSelectMovie(movie.slug)}
-              className="group relative bg-[#0f111a] rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-700/60 transition-all cursor-pointer shadow-xl flex flex-col"
+              className="group relative bg-app-card rounded-2xl overflow-hidden border border-app-border hover:border-amber-500/40 transition-all cursor-pointer shadow-xl flex flex-col"
             >
               {/* Aspect Ratio Poster Image Container */}
               <div className="relative aspect-[2/3] overflow-hidden w-full bg-gray-900">
@@ -126,21 +126,21 @@ export default function MovieGrid({
               {/* Title / Meta Details Text Block */}
               <div className="p-3.5 flex-1 flex flex-col justify-between">
                 <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-gray-100 group-hover:text-amber-400 transition-colors line-clamp-1 leading-tight" title={movie.name}>
+                  <h3 className="text-sm font-bold text-app-text group-hover:text-amber-500 transition-colors line-clamp-1 leading-tight" title={movie.name}>
                     {movie.name}
                   </h3>
-                  <h4 className="text-[11px] text-gray-500 font-medium line-clamp-1 truncate" title={movie.origin_name}>
+                  <h4 className="text-[11px] text-app-text-muted font-medium line-clamp-1 truncate" title={movie.origin_name}>
                     {movie.origin_name}
                   </h4>
                 </div>
 
-                <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-gray-800/60 text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
+                <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-app-border text-[10px] text-app-text-muted font-semibold uppercase tracking-wider">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-gray-600" />
                     {movie.year || "N/A"}
                   </span>
                   {movie.time && (
-                    <span className="bg-[#1c1e29] px-1.5 py-0.5 rounded text-[9px]">
+                    <span className="bg-app-bg-input text-app-text-muted px-1.5 py-0.5 rounded text-[9px]">
                       {movie.time}
                     </span>
                   )}
@@ -153,12 +153,12 @@ export default function MovieGrid({
 
       {/* Pagination controls */}
       {pagination && pagination.totalPages > 1 && onPageChange && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 pb-12 border-t border-gray-900/60 mt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 pb-12 border-t border-app-border mt-4">
           <button
             id="page-prev-btn"
             disabled={pagination.currentPage === 1}
             onClick={() => onPageChange(pagination.currentPage - 1)}
-            className="px-4 py-2 text-xs font-semibold rounded-xl border border-gray-800 bg-[#0f111a] text-gray-400 hover:text-white hover:border-gray-700 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center justify-center min-w-[100px]"
+            className="px-4 py-2 text-xs font-semibold rounded-xl border border-app-border bg-app-card text-app-text-muted hover:text-app-text hover:border-amber-500/40 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center justify-center min-w-[100px]"
           >
             &larr; Trang trước
           </button>
@@ -211,7 +211,7 @@ export default function MovieGrid({
                     className={`w-9 h-9 text-xs rounded-xl flex items-center justify-center font-bold font-mono transition-all duration-200 cursor-pointer ${
                       isCurrent
                         ? "bg-amber-500 text-black font-extrabold shadow-md shadow-amber-500/20 shadow-inner"
-                        : "bg-[#0f111a] border border-gray-800/80 text-gray-400 hover:text-white hover:border-amber-500/40"
+                        : "bg-app-card border border-app-border text-app-text-muted hover:text-app-text hover:border-amber-500/40"
                     }`}
                   >
                     {p}
@@ -225,7 +225,7 @@ export default function MovieGrid({
             id="page-next-btn"
             disabled={pagination.currentPage === pagination.totalPages}
             onClick={() => onPageChange(pagination.currentPage + 1)}
-            className="px-4 py-2 text-xs font-semibold rounded-xl border border-gray-800 bg-[#0f111a] text-gray-400 hover:text-white hover:border-gray-700 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center justify-center min-w-[100px]"
+            className="px-4 py-2 text-xs font-semibold rounded-xl border border-app-border bg-app-card text-app-text-muted hover:text-app-text hover:border-amber-500/40 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center justify-center min-w-[100px]"
           >
             Trang sau &rarr;
           </button>

@@ -10,12 +10,12 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#07080c] border-t border-gray-900 mt-20 text-gray-500 py-12 px-4">
+    <footer className="bg-app-card border-t border-app-border mt-20 text-app-text-muted py-12 px-4 transition-colors duration-300">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         
         {/* Left column */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-gray-100">
+          <div className="flex items-center gap-2 text-app-text">
             <div className="w-8 h-8 bg-gradient-to-tr from-amber-500 to-rose-500 rounded-lg flex items-center justify-center font-bold">
               K
             </div>
@@ -53,7 +53,7 @@ export default function Footer() {
 
       </div>
 
-      <div className="max-w-7xl mx-auto border-t border-gray-900/40 mt-8 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-gray-600">
+      <div className="max-w-7xl mx-auto border-t border-app-border mt-8 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-gray-600">
         <p>© {currentYear} KKPHIM. Bảo lưu mọi quyền tự do học hỏi.</p>
         <p className="flex items-center gap-1">
           Thiết kế cao cấp bằng <span className="text-rose-500">❤</span> bởi AI Coding Studio

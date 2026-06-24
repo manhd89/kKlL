@@ -49,7 +49,7 @@ export default function Header({
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0b0c10]/95 border-b border-gray-800 backdrop-blur-md">
+    <header className="sticky top-0 z-50 bg-app-bg-header border-b border-app-border backdrop-blur-md transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
@@ -65,7 +65,7 @@ export default function Header({
             <div className="w-10 h-10 bg-gradient-to-tr from-amber-500 to-rose-500 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-rose-500/10 group-hover:scale-105 transition-transform">
               <Play className="fill-white w-5 h-5 ml-0.5" />
             </div>
-            <span className="text-xl font-extrabold tracking-wider bg-gradient-to-r from-white via-gray-100 to-amber-400 bg-clip-text text-transparent hidden sm:block">
+            <span className="text-xl font-extrabold tracking-wider bg-gradient-to-r from-gray-900 to-amber-600 dark:from-white dark:via-gray-100 dark:to-amber-400 bg-clip-text text-transparent hidden sm:block">
               KK<span className="text-amber-500">PHIM</span>
             </span>
           </div>
@@ -83,7 +83,7 @@ export default function Header({
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                   activeTab === cat.slug
                     ? "bg-amber-500/15 text-amber-500 border border-amber-500/30"
-                    : "text-gray-300 hover:text-white hover:bg-white/5 border border-transparent"
+                    : "text-app-text-muted hover:text-app-text hover:bg-app-bg-input border border-transparent"
                 }`}
               >
                 {cat.name}
@@ -98,7 +98,7 @@ export default function Header({
             >
               <button
                 id="genre-dropdown-trigger"
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 border border-transparent transition-colors cursor-pointer ${
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-app-text-muted hover:text-app-text hover:bg-app-bg-input border border-transparent transition-colors cursor-pointer ${
                   activeTab === "genre" ? "text-amber-500 bg-amber-500/10 border border-amber-500/20" : ""
                 }`}
               >
@@ -109,7 +109,7 @@ export default function Header({
               {activeDropdown === "genre" && (
                 <div 
                   id="genre-dropdown-menu"
-                  className="absolute top-full left-0 mt-1 w-64 max-h-[350px] overflow-y-auto bg-[#0f111a] border border-gray-800 rounded-xl shadow-2xl py-2 z-50 grid grid-cols-2 gap-1 px-2 scrollbar-thin scrollbar-thumb-gray-800"
+                  className="absolute top-full left-0 mt-1 w-64 max-h-[350px] overflow-y-auto bg-app-card border border-app-border rounded-xl shadow-2xl py-2 z-50 grid grid-cols-2 gap-1 px-2 scrollbar-thin scrollbar-thumb-app-border"
                 >
                   {genres.map((g) => (
                     <button
@@ -122,7 +122,7 @@ export default function Header({
                       className={`text-left px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
                         activeTab === "genre" && activeSubSlug === g.slug
                           ? "bg-amber-500 text-black font-semibold"
-                          : "text-gray-300 hover:text-white hover:bg-white/5"
+                          : "text-app-text-muted hover:text-app-text hover:bg-app-bg-input"
                       }`}
                     >
                       {g.name}
@@ -140,7 +140,7 @@ export default function Header({
             >
               <button
                 id="country-dropdown-trigger"
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 border border-transparent transition-colors cursor-pointer ${
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-app-text-muted hover:text-app-text hover:bg-app-bg-input border border-transparent transition-colors cursor-pointer ${
                   activeTab === "country" ? "text-amber-500 bg-amber-500/10 border border-amber-500/20" : ""
                 }`}
               >
@@ -151,7 +151,7 @@ export default function Header({
               {activeDropdown === "country" && (
                 <div 
                   id="country-dropdown-menu"
-                  className="absolute top-full left-0 mt-1 w-60 max-h-[350px] overflow-y-auto bg-[#0f111a] border border-gray-800 rounded-xl shadow-2xl py-2 z-50 scrollbar-thin"
+                  className="absolute top-full left-0 mt-1 w-60 max-h-[350px] overflow-y-auto bg-app-card border border-app-border rounded-xl shadow-2xl py-2 z-50 scrollbar-thin"
                 >
                   {countries.map((c) => (
                     <button
@@ -164,7 +164,7 @@ export default function Header({
                       className={`w-full text-left px-4 py-2 text-xs rounded-md transition-colors cursor-pointer ${
                         activeTab === "country" && activeSubSlug === c.slug
                           ? "bg-amber-500 text-black font-semibold"
-                          : "text-gray-300 hover:text-white hover:bg-white/5"
+                          : "text-app-text-muted hover:text-app-text hover:bg-app-bg-input"
                       }`}
                     >
                       {c.name}
@@ -185,7 +185,7 @@ export default function Header({
                 placeholder="Tìm phim, diễn viên..."
                 value={searchVal}
                 onChange={(e) => setSearchVal(e.target.value)}
-                className="w-full bg-[#161925] text-gray-100 pl-10 pr-4 py-2 rounded-xl text-sm border border-gray-800 hover:border-gray-700 focus:border-amber-500 focus:outline-none transition-colors"
+                className="w-full bg-app-bg-input text-app-text pl-10 pr-4 py-2 rounded-xl text-sm border border-app-border hover:border-amber-500/40 focus:border-amber-500 focus:outline-none transition-colors"
               />
             </form>
           </div>
@@ -201,7 +201,7 @@ export default function Header({
               className={`relative p-2 rounded-xl cursor-pointer transition-all ${
                 activeTab === "bookmarks"
                   ? "bg-rose-500/20 text-rose-500 border border-rose-500/30 shadow-md shadow-rose-500/10"
-                  : "text-gray-300 hover:text-rose-400 hover:bg-rose-500/5"
+                  : "text-app-text-muted hover:text-rose-400 hover:bg-rose-500/5"
               }`}
               title="Danh sách yêu thích"
             >
@@ -217,7 +217,7 @@ export default function Header({
             <button
               id="mobile-menu-trigger"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 lg:hidden rounded-lg bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-2 lg:hidden rounded-lg bg-app-bg-input text-app-text-muted hover:text-app-text transition-colors"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -229,7 +229,7 @@ export default function Header({
       {isMobileMenuOpen && (
         <div 
           id="mobile-nav-panel"
-          className="lg:hidden bg-[#0d0f17] border-t border-gray-800/80 max-h-[85vh] overflow-y-auto py-4 px-4 space-y-4"
+          className="lg:hidden bg-app-card border-t border-app-border max-h-[85vh] overflow-y-auto py-4 px-4 space-y-4 transition-colors duration-300"
         >
           {/* Mobile search bar */}
           <form onSubmit={handleSearchSubmit} className="relative">
@@ -240,7 +240,7 @@ export default function Header({
               placeholder="Tìm phim, diễn viên..."
               value={searchVal}
               onChange={(e) => setSearchVal(e.target.value)}
-              className="w-full bg-[#161925] text-gray-100 pl-10 pr-4 py-2 rounded-xl text-sm border border-gray-800 focus:border-amber-500 focus:outline-none"
+              className="w-full bg-app-bg-input text-app-text pl-10 pr-4 py-2 rounded-xl text-sm border border-app-border focus:border-amber-500 focus:outline-none"
             />
           </form>
 
@@ -259,7 +259,7 @@ export default function Header({
                   className={`px-3 py-2 text-left rounded-lg text-xs font-semibold cursor-pointer ${
                     activeTab === cat.slug
                       ? "bg-amber-500/20 text-amber-400"
-                      : "bg-[#161a24] text-gray-300 hover:text-white"
+                      : "bg-app-bg-input text-app-text-muted hover:text-app-text"
                   }`}
                 >
                   {cat.name}
@@ -283,7 +283,7 @@ export default function Header({
                   className={`text-[11px] py-1 px-2 rounded-md truncate cursor-pointer ${
                     activeTab === "genre" && activeSubSlug === g.slug
                       ? "bg-amber-500 text-black font-semibold"
-                      : "bg-white/5 text-gray-300 hover:text-white"
+                      : "bg-app-bg-input text-app-text-muted hover:text-app-text"
                   }`}
                 >
                   {g.name}
@@ -307,7 +307,7 @@ export default function Header({
                   className={`text-[11px] py-1 px-2 rounded-md truncate cursor-pointer ${
                     activeTab === "country" && activeSubSlug === c.slug
                       ? "bg-amber-500 text-black font-semibold"
-                      : "bg-white/5 text-gray-300 hover:text-white"
+                      : "bg-app-bg-input text-app-text-muted hover:text-app-text"
                   }`}
                 >
                   {c.name}

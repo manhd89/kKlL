@@ -4,11 +4,45 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-app-bg: var(--app-bg);
+  --color-app-card: var(--app-card);
+  --color-app-border: var(--app-border);
+  --color-app-text: var(--app-text);
+  --color-app-text-muted: var(--app-text-muted);
+  --color-app-bg-header: var(--app-bg-header);
+  --color-app-bg-input: var(--app-bg-input);
+}
+
+:root {
+  --app-bg: #f8fafc;
+  --app-card: #ffffff;
+  --app-border: #e2e8f0;
+  --app-text: #0f172a;
+  --app-text-muted: #64748b;
+  --app-bg-header: rgba(255, 255, 255, 0.95);
+  --app-bg-input: #f1f5f9;
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg: #0a0a0f;
+    --app-card: #0f111a;
+    --app-border: #1f2937;
+    --app-text: #f3f4f6;
+    --app-text-muted: #9ca3af;
+    --app-bg-header: rgba(11, 12, 16, 0.95);
+    --app-bg-input: #161925;
+    --scrollbar-track: #08090d;
+    --scrollbar-thumb: #1e2230;
+  }
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: #050508;
+  background-color: var(--app-bg);
+  color: var(--app-text);
 }
 
 /* Custom minimal scrollbar */
@@ -18,11 +52,11 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #08090d;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e2230;
+  background: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 

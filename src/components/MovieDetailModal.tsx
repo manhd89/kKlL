@@ -364,7 +364,7 @@ export default function MovieDetailModal({
                 {activeEpisode ? (
                   <div className="relative aspect-[16/9] w-full bg-[#030303] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
                     {activeEpisode.link_m3u8 ? (
-                      <HlsPlayer url={activeEpisode.link_m3u8} autoplay={true} />
+                      <HlsPlayer url={activeEpisode.link_m3u8} autoplay={false} />
                     ) : (
                       <div className="aspect-[16/9] w-full bg-gray-950 border border-gray-900 rounded-2xl flex flex-col items-center justify-center text-center p-6 space-y-2">
                         <AlertTriangle className="w-10 h-10 text-amber-500 animate-pulse" />

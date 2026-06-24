@@ -368,7 +368,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-gray-100 font-sans flex flex-col">
+    <div className="min-h-screen bg-app-bg text-app-text font-sans flex flex-col transition-colors duration-300">
       {/* Dynamic Header Component */}
       <Header
         genres={genres}
@@ -395,7 +395,7 @@ export default function App() {
         )}
 
         {/* Categories / Genres header label panel */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-900 pb-5">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-app-border pb-5">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-amber-500/10 text-amber-500 rounded-xl">
               {activeTab === "bookmarks" ? (
@@ -405,7 +405,7 @@ export default function App() {
               )}
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-gray-100 tracking-tight leading-none uppercase">
+              <h2 className="text-xl sm:text-2xl font-black text-app-text tracking-tight leading-none uppercase">
                 {getSectionTitle()}
               </h2>
               {pagination && (
