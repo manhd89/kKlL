@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import { DefaultVideoLayout, defaultLayoutIcons } from "@vidstack/react/player/layouts/default";
 import { AlertTriangle, Loader2 } from "lucide-react";
@@ -15,6 +15,8 @@ import "@vidstack/react/player/styles/default/layouts/video.css";
 interface StreamPlayerProps {
   url: string;
   autoplay?: boolean;
+  initialTime?: number;
+  onTimeUpdate?: (currentTime: number, duration: number) => void;
 }
 
 /**
@@ -29,9 +31,10 @@ function getProxiedUrl(url: string): string {
   return `/proxy-hls/?url=${encodeURIComponent(url)}`;
 }
 
-export default function StreamPlayer({ url, autoplay = false }: StreamPlayerProps) {
+export default function StreamPlayer({ url, autoplay = false, initialTime = 0, onTimeUpdate }: StreamPlayerProps) {
   const [error, setError] = useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const playerRef = useRef<any>(null);
 
   const proxiedUrl = getProxiedUrl(url);
 
@@ -44,6 +47,21 @@ export default function StreamPlayer({ url, autoplay = false }: StreamPlayerProp
   const handleCanPlay = () => {
     setIsInitialLoading(false);
     setError(null);
+    if (initialTime > 0 && playerRef.current) {
+      try {
+        playerRef.current.currentTime = initialTime;
+      } catch (e) {
+        console.warn("Could not seek to initialTime", e);
+      }
+    }
+  };
+
+  const handleTimeUpdateEvent = (detail: any) => {
+    const cur = detail?.currentTime ?? detail?.detail?.currentTime ?? playerRef.current?.state?.currentTime ?? playerRef.current?.currentTime ?? 0;
+    const dur = detail?.duration ?? detail?.detail?.duration ?? playerRef.current?.state?.duration ?? playerRef.current?.duration ?? 0;
+    if (onTimeUpdate && cur > 0) {
+      onTimeUpdate(cur, dur);
+    }
   };
 
   const handleError = (event: any) => {
@@ -84,10 +102,13 @@ export default function StreamPlayer({ url, autoplay = false }: StreamPlayerProp
       {proxiedUrl && (
         <MediaPlayer
           key={proxiedUrl}
+          ref={playerRef}
           title=""
           src={proxiedUrl}
           autoplay={autoplay}
+          currentTime={initialTime > 0 ? initialTime : undefined}
           onCanPlay={handleCanPlay}
+          onTimeUpdate={handleTimeUpdateEvent}
           onError={handleError}
           playsInline
           className="w-full h-full"

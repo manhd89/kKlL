@@ -185,7 +185,7 @@ export default function MovieDetailModal({
           <div className="absolute top-0 left-0 right-0 h-[300px] overflow-hidden pointer-events-none select-none z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-app-card/85 to-app-card z-10 transition-colors duration-300" />
             <img 
-              src={getMovieImageUrl(movieData.poster_url || movieData.thumb_url)} 
+              src={getMovieImageUrl(movieData.thumb_url || movieData.poster_url)} 
               alt="" 
               className="w-full h-full object-cover scale-110 opacity-15 dark:opacity-25 blur-3xl"
               referrerPolicy="no-referrer"
@@ -226,7 +226,7 @@ export default function MovieDetailModal({
                 <div className="md:col-span-4 lg:col-span-3 flex flex-col gap-4">
                   <div className="aspect-[2/3] w-full rounded-2xl overflow-hidden border border-app-border shadow-2xl bg-gray-900 group">
                     <img 
-                      src={getMovieImageUrl(movieData.thumb_url || movieData.poster_url)} 
+                      src={getMovieImageUrl(movieData.poster_url || movieData.thumb_url)} 
                       alt={movieData.name} 
                       className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                       referrerPolicy="no-referrer"

@@ -70,7 +70,7 @@ export default function MovieGrid({
               {/* Aspect Ratio Poster Image Container */}
               <div className="relative aspect-[2/3] overflow-hidden w-full bg-gray-900">
                 <img
-                  src={getMovieImageUrl(movie.thumb_url || movie.poster_url, pathImage)}
+                  src={getMovieImageUrl(movie.poster_url || movie.thumb_url, pathImage)}
                   alt={movie.name}
                   loading="lazy"
                   referrerPolicy="no-referrer"

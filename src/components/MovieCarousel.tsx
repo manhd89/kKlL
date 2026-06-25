@@ -63,7 +63,7 @@ export default function MovieCarousel({
         >
           {/* Main Background Image */}
           <img
-            src={getMovieImageUrl(activeMovie.poster_url || activeMovie.thumb_url, pathImage)}
+            src={getMovieImageUrl(activeMovie.thumb_url || activeMovie.poster_url, pathImage)}
             alt={activeMovie.name}
             className="w-full h-full object-cover opacity-70 dark:opacity-35 scale-102 blur-[0.05px] transition-opacity duration-300"
             referrerPolicy="no-referrer"

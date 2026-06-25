@@ -15,6 +15,12 @@ export interface Movie {
   episode_current?: string;
   quality?: string;
   lang?: string;
+  history_server?: string;
+  history_episode_name?: string;
+  history_episode_slug?: string;
+  history_position?: number;
+  history_duration?: number;
+  history_updated_at?: number;
 }
 
 export interface Genre {
