@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import MovieCarousel from "./components/MovieCarousel";
 import MovieGrid from "./components/MovieGrid";
-import MovieDetailModal from "./components/MovieDetailModal";
+import MovieDetailPage from "./components/MovieDetailPage";
 import Footer from "./components/Footer";
 import { Movie, Genre, Country, Pagination } from "./types";
 import { Film, Sparkles, History, Trash2 } from "lucide-react";
@@ -310,8 +310,15 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Automatically add a movie to the top of Watch History
-  const handleAddToHistory = (movieDetail: any) => {
+  // Automatically add/update a movie in Watch History with playback position
+  const handleUpdateHistoryState = (
+    movieDetail: any,
+    serverName: string,
+    epName: string,
+    epSlug: string,
+    position: number,
+    duration: number
+  ) => {
     if (!movieDetail) return;
 
     const movieItem: Movie = {
@@ -324,7 +331,13 @@ export default function App() {
       year: movieDetail.year || new Date().getFullYear(),
       episode_current: movieDetail.episode_current || "",
       quality: movieDetail.quality || "",
-      lang: movieDetail.lang || ""
+      lang: movieDetail.lang || "",
+      history_server: serverName,
+      history_episode_name: epName,
+      history_episode_slug: epSlug,
+      history_position: position,
+      history_duration: duration,
+      history_updated_at: Date.now()
     };
 
     setWatchHistory((prev) => {
@@ -376,98 +389,105 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-10">
-        
-        {/* Widescreen visual spotlight carousel at the top (Only on standard home pages page 1) */}
-        {activeTab === "phim-moi-cap-nhat" && currentPage === 1 && !isLoading && movies.length > 0 && (
-          <MovieCarousel
-            movies={movies}
-            pathImage={pathImage}
-            onSelectMovie={setSelectedMovieSlug}
+        {selectedMovieSlug ? (
+          <MovieDetailPage
+            movieSlug={selectedMovieSlug}
+            onBack={() => {
+              setSelectedMovieSlug(null);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            onSelectRelatedMovie={(slug) => {
+              setSelectedMovieSlug(slug);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            watchHistory={watchHistory}
+            onUpdateHistoryState={handleUpdateHistoryState}
           />
-        )}
-
-        {/* Categories / Genres header label panel */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-app-border pb-5">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/10 text-amber-500 rounded-xl">
-              {activeTab === "history" ? (
-                <History className="w-5.5 h-5.5" />
-              ) : (
-                <Film className="w-5.5 h-5.5" />
-              )}
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-app-text tracking-tight leading-none uppercase">
-                {getSectionTitle()}
-              </h2>
-              {pagination && (
-                <p className="text-[10px] text-gray-500 font-mono tracking-wider mt-1.5 font-semibold">
-                  HIỂN THỊ {movies.length} TRÊN TỔNG SỐ {pagination.totalItems} PHIM
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Quick toggle list controls for history view conditions */}
-          {activeTab === "history" && watchHistory.length > 0 && (
-            <button
-              onClick={handleClearHistory}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl text-xs font-bold border border-rose-500/20 active:scale-95 transition-all cursor-pointer shadow-sm"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              Xoá Toàn Bộ Lịch Sử
-            </button>
-          )}
-
-          {activeTab === "history" && watchHistory.length === 0 && (
-            <div className="text-xs text-amber-500 font-semibold bg-amber-500/5 px-3 py-1.5 rounded-lg border border-amber-500/15">
-              Bạn chưa xem bộ phim nào gần đây! Hãy bấm vào các bộ phim để thưởng thức.
-            </div>
-          )}
-        </div>
-
-        {/* Central main movie grid list panel */}
-        {error ? (
-          <div className="py-20 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-4">
-            <div className="w-12 h-12 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center">
-              <Sparkles className="w-6 h-6 animate-pulse" />
-            </div>
-            <div>
-              <p className="text-gray-200 font-black">Xung đột tín hiệu đường truyền API</p>
-              <p className="text-gray-500 text-xs mt-1.5 leading-relaxed">
-                Nguồn máy chủ của KKPhim hiện đang nghỉ tải hoặc giới hạn lượt truy vấn tạm thời. Đừng lo lắng, hãy bấm thử lại hoặc chọn bộ lọc thể loại khác.
-              </p>
-            </div>
-            <button
-              onClick={() => handleSelectTab("phim-moi-cap-nhat")}
-              className="px-5 py-2.5 bg-amber-500 text-black font-extrabold rounded-xl text-xs hover:bg-amber-400 cursor-pointer shadow-lg shadow-amber-500/10 active:scale-95 transition-all"
-            >
-              Mở lại Trang chủ
-            </button>
-          </div>
         ) : (
-          <MovieGrid
-            movies={movies}
-            pathImage={pathImage}
-            onSelectMovie={setSelectedMovieSlug}
-            pagination={pagination}
-            onPageChange={handlePageChange}
-            isLoading={isLoading}
-            isHistoryTab={activeTab === "history"}
-            onRemoveFromHistory={handleRemoveFromHistory}
-          />
+          <>
+            {/* Widescreen visual spotlight carousel at the top (Only on standard home pages page 1) */}
+            {activeTab === "phim-moi-cap-nhat" && currentPage === 1 && !isLoading && movies.length > 0 && (
+              <MovieCarousel
+                movies={movies}
+                pathImage={pathImage}
+                onSelectMovie={setSelectedMovieSlug}
+              />
+            )}
+
+            {/* Categories / Genres header label panel */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-app-border pb-5">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-500/10 text-amber-500 rounded-xl">
+                  {activeTab === "history" ? (
+                    <History className="w-5.5 h-5.5" />
+                  ) : (
+                    <Film className="w-5.5 h-5.5" />
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-app-text tracking-tight leading-none uppercase">
+                    {getSectionTitle()}
+                  </h2>
+                  {pagination && (
+                    <p className="text-[10px] text-gray-500 font-mono tracking-wider mt-1.5 font-semibold">
+                      HIỂN THỊ {movies.length} TRÊN TỔNG SỐ {pagination.totalItems} PHIM
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick toggle list controls for history view conditions */}
+              {activeTab === "history" && watchHistory.length > 0 && (
+                <button
+                  onClick={handleClearHistory}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl text-xs font-bold border border-rose-500/20 active:scale-95 transition-all cursor-pointer shadow-sm"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Xoá Toàn Bộ Lịch Sử
+                </button>
+              )}
+
+              {activeTab === "history" && watchHistory.length === 0 && (
+                <div className="text-xs text-amber-500 font-semibold bg-amber-500/5 px-3 py-1.5 rounded-lg border border-amber-500/15">
+                  Bạn chưa xem bộ phim nào gần đây! Hãy bấm vào các bộ phim để thưởng thức.
+                </div>
+              )}
+            </div>
+
+            {/* Central main movie grid list panel */}
+            {error ? (
+              <div className="py-20 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-4">
+                <div className="w-12 h-12 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <p className="text-gray-200 font-black">Xung đột tín hiệu đường truyền API</p>
+                  <p className="text-gray-500 text-xs mt-1.5 leading-relaxed">
+                    Nguồn máy chủ của KKPhim hiện đang nghỉ tải hoặc giới hạn lượt truy vấn tạm thời. Đừng lo lắng, hãy bấm thử lại hoặc chọn bộ lọc thể loại khác.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleSelectTab("phim-moi-cap-nhat")}
+                  className="px-5 py-2.5 bg-amber-500 text-black font-extrabold rounded-xl text-xs hover:bg-amber-400 cursor-pointer shadow-lg shadow-amber-500/10 active:scale-95 transition-all"
+                >
+                  Mở lại Trang chủ
+                </button>
+              </div>
+            ) : (
+              <MovieGrid
+                movies={movies}
+                pathImage={pathImage}
+                onSelectMovie={setSelectedMovieSlug}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                isLoading={isLoading}
+                isHistoryTab={activeTab === "history"}
+                onRemoveFromHistory={handleRemoveFromHistory}
+              />
+            )}
+          </>
         )}
-
       </main>
-
-      {/* Global immersive movie details & Streaming video player Overlay drawer */}
-      {selectedMovieSlug && (
-        <MovieDetailModal
-          movieSlug={selectedMovieSlug}
-          onClose={() => setSelectedMovieSlug(null)}
-          onAddToHistory={handleAddToHistory}
-        />
-      )}
 
       {/* Structured disclaimer website footer */}
       <Footer />
