@@ -290,6 +290,7 @@ export default function App() {
 
   // Handles updating active state selections
   const handleSelectTab = (tab: string, subSlug = "", label = "") => {
+    setSelectedMovieSlug(null);
     setActiveTab(tab);
     setActiveSubSlug(subSlug);
     setActiveLabel(label);
@@ -298,6 +299,7 @@ export default function App() {
   };
 
   const handleSearch = (keyword: string) => {
+    setSelectedMovieSlug(null);
     setActiveTab("search");
     setSearchKeyword(keyword);
     setActiveLabel(`Tìm kiếm: "${keyword}"`);

@@ -271,11 +271,6 @@ export default function MovieDetailPage({
         >
           <ArrowLeft className="w-4 h-4" /> Quay Lại
         </button>
-
-        <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-xl text-xs text-amber-400 font-semibold w-fit">
-          <History className="w-3.5 h-3.5 shrink-0" />
-          <span>Lưu tự động: Tập {activeEpisode?.name || "N/A"} ({selectedServerIndex + 1 > 0 ? episodes[selectedServerIndex]?.server_name : ""})</span>
-        </div>
       </div>
 
       {/* Top Details Grid */}
