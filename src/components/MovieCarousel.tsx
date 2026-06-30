@@ -65,13 +65,13 @@ export default function MovieCarousel({
           <img
             src={getMovieImageUrl(activeMovie.thumb_url || activeMovie.poster_url, pathImage)}
             alt={activeMovie.name}
-            className="w-full h-full object-cover opacity-70 dark:opacity-35 scale-102 blur-[0.05px] transition-opacity duration-300"
+            className="w-full h-full object-cover opacity-85 dark:opacity-60 scale-102 transition-opacity duration-300"
             referrerPolicy="no-referrer"
           />
 
           {/* Vignette Spotlighting Layer */}
-          <div className="absolute inset-0 bg-gradient-to-r from-app-card via-app-card/85 to-transparent dark:from-black dark:via-black/80 dark:to-transparent z-10 transition-colors duration-300" />
-          <div className="absolute inset-0 bg-gradient-to-t from-app-card/40 via-transparent to-transparent dark:from-[#0e1017] dark:via-transparent dark:to-[#0e1017]/30 z-10 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-r from-app-card via-app-card/65 to-transparent dark:from-[#0a0a0f] dark:via-[#0a0a0f]/50 dark:to-transparent z-10 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-app-card/20 via-transparent to-transparent dark:from-[#0a0a0f]/40 dark:via-transparent dark:to-transparent z-10 transition-colors duration-300" />
         </motion.div>
       </AnimatePresence>
 

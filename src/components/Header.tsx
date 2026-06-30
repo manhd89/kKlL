@@ -59,11 +59,11 @@ export default function Header({
               setSearchVal("");
               onSelectTab("phim-moi-cap-nhat");
             }}
-            className="flex items-center gap-2 cursor-pointer group shrink-0"
+            className="flex items-center gap-2.5 cursor-pointer group shrink-0"
             id="app-logo"
           >
-            <div className="w-10 h-10 bg-gradient-to-tr from-amber-500 to-rose-500 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-rose-500/10 group-hover:scale-105 transition-transform">
-              <Play className="fill-white w-5 h-5 ml-0.5" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-amber-500/10 group-hover:scale-105 transition-transform border border-app-border/40 dark:border-gray-800">
+              <img src="/logo.jpg" alt="KKPhim Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
             <span className="text-xl font-extrabold tracking-wider bg-gradient-to-r from-gray-900 to-amber-600 dark:from-white dark:via-gray-100 dark:to-amber-400 bg-clip-text text-transparent hidden sm:block">
               KK<span className="text-amber-500">PHIM</span>
